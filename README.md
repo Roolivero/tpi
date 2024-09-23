@@ -1,1 +1,5 @@
 # tpi
+
+> [!WARNING]
+> NO USAR PYTHON EN WINDOWS!!!
+
