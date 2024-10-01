@@ -2,30 +2,38 @@ package spn;
 
 import archivos.ArchivoSalida;
 import proceso.Proceso;
+import proceso.Proceso;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 public class SPN {
     private List<Proceso> procesos;
     private int TIP;
     private int TCP;
     private int TFP;
-    private Queue<Proceso> colaListos;
+    private PriorityQueue<Proceso> colaListos;
     private List<Proceso> colaBloqueados;
     private Queue<Proceso> colaFinalizados;
     private int tiempoActual;
     public String resultadoArchivo;
     private ArchivoSalida archivoSalida;
 
+
     public SPN(List<Integer> listaDatos, List<Proceso> procesos, String rutaArchivo) {
         this.setProcesos(procesos);
-        this.setTIP(listaDatos.get(0));
-        this.setTCP(listaDatos.get(0));
-        this.setTFP(listaDatos.get(0));
+        this.setTIP(listaDatos.get(1));
+        this.setTCP(listaDatos.get(2));
+        this.setTFP(listaDatos.get(3));
 
-        this.colaListos = new LinkedList<>();
+        this.colaListos = new PriorityQueue<>((p1, p2) -> {
+            int comparacionRafaga = Integer.compare(p1.getDuracionRafaga(), p2.getDuracionRafaga());
+            if (comparacionRafaga != 0) return comparacionRafaga;
+
+            int comparacionTiempoArribo = Integer.compare(p1.getTiempoArribo(), p2.getTiempoArribo());
+            if (comparacionTiempoArribo != 0) return comparacionTiempoArribo;
+
+            return Integer.compare(p1.getNumeroProceso(), p2.getNumeroProceso());
+        });
         this.colaBloqueados = new LinkedList<>();
         this.colaFinalizados = new LinkedList<>();
         this.tiempoActual = 0;
@@ -38,6 +46,7 @@ public class SPN {
         this.archivoSalida = new ArchivoSalida(rutaArchivo);
     }
 
+
     public void ejecutar() {
         int cantProcesos = procesos.size();
         agregarResultado("Comienza la simulacion del planificador aplicando FCFS");
@@ -45,21 +54,21 @@ public class SPN {
         actualizaColaListos();
 
         while (this.getColaFinalizados().size() < cantProcesos) {
-            if (this.getColaListos().isEmpty()) {
+            if (this.getColaListos().isEmpty()) { // Si NO hay procesos, avanzo en el tiempo y actualizo las colas
                 this.tiempoActual++;
                 agregarResultado("Tiempo: " + this.tiempoActual);
                 System.out.println("Tiempo: " + this.tiempoActual);
                 actualizaColaListos();
                 actualizaColaBloqueados();
             } else {
-                Proceso proceso = this.colaListos.poll();
-                if (proceso.getRafagasEjecutadas() == 0) {
+                Proceso proceso = this.colaListos.poll(); // si SI hay procesos, saco el primero que este en la cola de listos
+                if (proceso.getRafagasEjecutadas() == 0) {  // verifico si ya ejecuto o no su TIP
                     ejecutarTIP(proceso);
                     actualizaColaListos();
                     actualizaColaBloqueados();
                 }
-                ejecutarRafaga(proceso);
-                if (proceso.getRafagasEjecutadas() == proceso.getCantRafagas()) {
+                ejecutarRafaga(proceso); // ejecuta la rafaga del proceso
+                if (proceso.getRafagasEjecutadas() == proceso.getCantRafagas()) { //Si ya ejecuto todas sus rafagas:
                     ejecutarTFP(proceso);
                     this.colaBloqueados.remove(proceso);
                     this.colaFinalizados.add(proceso);
@@ -107,7 +116,7 @@ public class SPN {
     }
 
     private void actualizaColaListos() {
-        for (Proceso proceso : procesos) {
+        for (Proceso proceso : this.procesos) {
             if (proceso.getTiempoArribo() == this.tiempoActual && !this.colaListos.contains(proceso) && !this.colaBloqueados.contains(proceso) && !this.colaFinalizados.contains(proceso)) {
                 this.colaListos.add(proceso);
                 agregarResultado("Llega el proceso P" + proceso.getNumeroProceso());
@@ -146,6 +155,7 @@ public class SPN {
             actualizaColaListos();
             actualizaColaBloqueados();
         }
+        proceso.setEstado(3);
         System.out.println("El proceso P" + proceso.getNumeroProceso() + " está en estado de running");
         agregarResultado("El proceso P" + proceso.getNumeroProceso() + " está en estado de running");
     }
@@ -177,6 +187,11 @@ public class SPN {
         System.out.println("El proceso P" + proceso.getNumeroProceso() + " ha terminado su ejecución");
         agregarResultado("El proceso P" + proceso.getNumeroProceso() + " ha terminado su ejecución");
     }
+
+    private void ordenarColaListos(){
+
+    }
+
 
     private void agregarResultado(String resultado) {
         this.resultadoArchivo += resultado + "\n";

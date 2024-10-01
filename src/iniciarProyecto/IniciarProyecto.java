@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class IniciarProyecto {
@@ -33,11 +34,16 @@ public class IniciarProyecto {
 
     public List<Integer> pedirDatos() {
         List<Integer> listaDatos = new ArrayList<>();
+        List<Integer> listaIntermedia = new ArrayList<>();
 
         int politica = solicitarPolitica();
         listaDatos.add(politica);
-        listaDatos = solicitarDatos(politica);
+        listaIntermedia = solicitarDatos(politica);
+        for (Integer dato : listaIntermedia){
+            listaDatos.add(dato);
+        }
 
+        System.out.println("Cantidad de datos en la lista de datos: " + listaDatos.size());
         return listaDatos;
     }
 

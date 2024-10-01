@@ -19,9 +19,9 @@ public class FCFS {
 
     public FCFS(List<Integer> listaDatos, List<Proceso> procesos, String rutaArchivo) {
         this.setProcesos(procesos);
-        this.setTIP(listaDatos.get(0));
-        this.setTCP(listaDatos.get(0));
-        this.setTFP(listaDatos.get(0));
+        this.setTIP(listaDatos.get(1));
+        this.setTCP(listaDatos.get(2));
+        this.setTFP(listaDatos.get(3));
 
         this.colaListos = new LinkedList<>();
         this.colaBloqueados = new LinkedList<>();
@@ -37,6 +37,9 @@ public class FCFS {
     }
 
     public void ejecutar() {
+        System.out.println("TIP: " + this.getTIP());
+        System.out.println("TCP: " + this.getTCP());
+        System.out.println("TFP: " + this.getTFP());
         int cantProcesos = procesos.size();
         agregarResultado("Comienza la simulacion del planificador aplicando FCFS");
         agregarResultado("Tiempo: " + this.tiempoActual);
@@ -50,14 +53,14 @@ public class FCFS {
                 actualizaColaListos();
                 actualizaColaBloqueados();
             } else { // si SI hay procesos, saco el primero que este en la cola de listos
-                Proceso proceso = this.colaListos.poll();
-                if (proceso.getRafagasEjecutadas() == 0) { // verifico si ya ejecuto o no su TIP
+                    Proceso proceso = this.colaListos.poll();
+               if (proceso.getRafagasEjecutadas() == 0) { // verifico si ya ejecuto o no su TIP
                     ejecutarTIP(proceso);
                     actualizaColaListos();
                     actualizaColaBloqueados();
                 }
                 ejecutarRafaga(proceso); // ejecuta la rafaga del proceso
-                if (proceso.getRafagasEjecutadas() == proceso.getCantRafagas()) {
+                if (proceso.getRafagasEjecutadas() == proceso.getCantRafagas()) { //Si ya ejecuto todas sus rafagas:
                     ejecutarTFP(proceso);
                     this.colaBloqueados.remove(proceso);
                     this.colaFinalizados.add(proceso);
@@ -73,7 +76,7 @@ public class FCFS {
                     this.colaBloqueados.add(proceso);
                     actualizaColaListos();
                     actualizaColaBloqueados();
-                }
+               }
             }
         }
         System.out.println("El planificador de procesos terminó exitosamente!");

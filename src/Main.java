@@ -1,6 +1,7 @@
 import fcfs.FCFS;
 import iniciarProyecto.IniciarProyecto;
 import prioridadExterna.PrioridadExterna;
+import proceso.Pcb;
 import proceso.Proceso;
 import roundRobin.RoundRobin;
 import spn.SPN;
@@ -32,10 +33,9 @@ public class Main {
         String rutaArvhivoSPN = "C:\\Users\\oroci\\OneDrive\\Desktop\\archivo_SPN.txt";;
 
 
-
         int opcion = listaDatos.get(0);
         if(opcion == 1){
-            FCFS fcfs = new FCFS(listaDatos,listaProcesos, rutaArvhivoSPN);
+            FCFS fcfs = new FCFS(listaDatos,listaProcesos, rutaArvhivoFCFS);
             fcfs.ejecutar();
         } else if (opcion == 2) {
             PrioridadExterna prioridadExterna = new PrioridadExterna(listaDatos);
@@ -44,11 +44,16 @@ public class Main {
         } else if (opcion == 4) {
             SPN spn = new SPN(listaDatos,listaProcesos,rutaArvhivoSPN);
             spn.ejecutar();
+            //spn.ejecutar();
         } else if (opcion == 5) {
             SRTN srtn = new SRTN (listaDatos);
         }
 
-
+        List<Pcb> procesosPcb = new ArrayList<>();
+        for (Proceso proceso : listaProcesos){
+            Pcb procesoPCB = new Pcb(proceso.getNumeroProceso(),proceso.getTiempoArribo(),proceso.getCantRafagas(),proceso.getDuracionRafaga(),proceso.getDuracionBloqueo(),proceso.getPrioridad());
+            procesosPcb.add(procesoPCB);
+        }
 
 
     }
