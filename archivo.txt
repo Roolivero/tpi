@@ -1,0 +1,5 @@
+nombre,tiempo_arribo,cant_rafagas,duracion_rafaga,tiempo_bloqueo,prioridad_externa
+p1
+p2
+p3
+p4
