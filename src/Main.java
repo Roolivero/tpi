@@ -28,16 +28,22 @@ public class Main {
         listaProcesos.add(proceso2);
         listaProcesos.add(proceso3);
 
+        String rutaArvhivoFCFS = "C:\\Users\\oroci\\OneDrive\\Desktop\\archivo_FCFS.txt";;
+        String rutaArvhivoSPN = "C:\\Users\\oroci\\OneDrive\\Desktop\\archivo_SPN.txt";;
+
+
+
         int opcion = listaDatos.get(0);
         if(opcion == 1){
-            FCFS fcfs = new FCFS(listaDatos,listaProcesos);
+            FCFS fcfs = new FCFS(listaDatos,listaProcesos, rutaArvhivoSPN);
             fcfs.ejecutar();
         } else if (opcion == 2) {
             PrioridadExterna prioridadExterna = new PrioridadExterna(listaDatos);
         } else if (opcion == 3){
             RoundRobin roundRobin = new RoundRobin(listaDatos);
         } else if (opcion == 4) {
-            SPN spn = new SPN(listaDatos);
+            SPN spn = new SPN(listaDatos,listaProcesos,rutaArvhivoSPN);
+            spn.ejecutar();
         } else if (opcion == 5) {
             SRTN srtn = new SRTN (listaDatos);
         }

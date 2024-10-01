@@ -28,22 +28,23 @@ public class Proceso {
 
     public void actualizarRafaga(){
         this.subRafagasEjecutadas++;
-        System.out.println("Sub rafaga numero: " + this.subRafagasEjecutadas + " del proceso P" + this.numeroProceso);
+        //System.out.println("Sub rafaga numero: " + this.subRafagasEjecutadas + " del proceso P" + this.numeroProceso);
         if(this.subRafagasEjecutadas == this.duracionRafaga){
+            //System.out.println("Se ejecuto la sub rafaga numero " + this.subRafagasEjecutadas + " del proceso P" + this.numeroProceso);
             this.setSubRafagasEjecutadas(0);
             this.rafagasEjecutadas ++;
-            System.out.println("Se ejecuto la rafaga numero: " + this.rafagasEjecutadas + " del proceso P" + this.numeroProceso);
+            //System.out.println("Se ejecuto la rafaga numero: " + this.rafagasEjecutadas + " del proceso P" + this.numeroProceso);
         }
     }
 
     public void actualizarBloqueos(){
         if(this.subBloqueosEjecutados == this.duracionBloqueo){
             this.bloqueosEjecutados ++;
-            System.out.println("Se ejecuto el bloqueo numero: " + this.bloqueosEjecutados + " del proceso P" + this.numeroProceso);
+           //System.out.println("Se ejecuto el bloqueo numero: " + this.bloqueosEjecutados + " del proceso P" + this.numeroProceso);
             this.subBloqueosEjecutados = 0;
         } else {
             this.subBloqueosEjecutados++;
-            System.out.println("Sub bloqueo numero: " + this.subBloqueosEjecutados + " del proceso P" + this.numeroProceso);
+            //System.out.println("Sub bloqueo numero: " + this.subBloqueosEjecutados + " del proceso P" + this.numeroProceso);
         }
     }
 
