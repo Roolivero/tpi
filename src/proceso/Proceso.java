@@ -12,6 +12,10 @@ public class Proceso {
     private int bloqueosEjecutados;
     private int subRafagasEjecutadas;
     private int subBloqueosEjecutados;
+    private boolean terminoRafaga;
+    private boolean ejecutoTIP;
+
+
     //Constructor
     public Proceso(int numeroProceso, int tiempoArribo, int cantRafagas, int duracionRafaga, int duracionBloqueo, int prioridad) {
         this.setNombre(numeroProceso);
@@ -24,27 +28,21 @@ public class Proceso {
         this.setBloqueosEjecutados(0);
         this.setSubRafagasEjecutadas(0);
         this.setSubBloqueosEjecutados(0);
+        this.setTerminoRafaga(false);
+        this.setEjecutoTIP(false);
     }
 
     public void actualizarRafaga(){
         this.subRafagasEjecutadas++;
-        //System.out.println("Sub rafaga numero: " + this.subRafagasEjecutadas + " del proceso P" + this.numeroProceso);
         if(this.subRafagasEjecutadas == this.duracionRafaga){
-            //System.out.println("Se ejecuto la sub rafaga numero " + this.subRafagasEjecutadas + " del proceso P" + this.numeroProceso);
-            this.setSubRafagasEjecutadas(0);
             this.rafagasEjecutadas ++;
-            //System.out.println("Se ejecuto la rafaga numero: " + this.rafagasEjecutadas + " del proceso P" + this.numeroProceso);
         }
     }
 
     public void actualizarBloqueos(){
+        this.subBloqueosEjecutados ++;
         if(this.subBloqueosEjecutados == this.duracionBloqueo){
             this.bloqueosEjecutados ++;
-           //System.out.println("Se ejecuto el bloqueo numero: " + this.bloqueosEjecutados + " del proceso P" + this.numeroProceso);
-            this.subBloqueosEjecutados = 0;
-        } else {
-            this.subBloqueosEjecutados++;
-            //System.out.println("Sub bloqueo numero: " + this.subBloqueosEjecutados + " del proceso P" + this.numeroProceso);
         }
     }
 
@@ -60,7 +58,8 @@ public class Proceso {
     public int getBloqueosEjecutados() {return bloqueosEjecutados;}
     public int getSubRafagasEjecutadas() {return subRafagasEjecutadas;}
     public int getSubBloqueosEjecutados() {return subBloqueosEjecutados;}
-
+    public boolean getTerminoRafaga() {return this.terminoRafaga;}
+    public boolean getEjecutoTIP() {return this.ejecutoTIP;}
 
     public void setNombre(int  numeroProceso) {this.numeroProceso = numeroProceso;}
     public void setTiempoArribo(int tiempoArribo) {this.tiempoArribo = tiempoArribo;}
@@ -72,6 +71,8 @@ public class Proceso {
     public void setBloqueosEjecutados(int bloqueosEjecutados) {this.bloqueosEjecutados = bloqueosEjecutados;}
     public void setSubRafagasEjecutadas(int subRafagasEjecutadas) {this.subRafagasEjecutadas = subRafagasEjecutadas;}
     public void setSubBloqueosEjecutados(int subBloqueosEjecutados) {this.subBloqueosEjecutados = subBloqueosEjecutados;}
+    public void setTerminoRafaga(boolean terminoRafaga) {this.terminoRafaga = terminoRafaga;}
+    public void setEjecutoTIP(boolean ejecutoTIP) {this.ejecutoTIP = ejecutoTIP;}
 }
 
 

@@ -49,7 +49,7 @@ public class SPN {
 
     public void ejecutar() {
         int cantProcesos = procesos.size();
-        agregarResultado("Comienza la simulacion del planificador aplicando FCFS");
+        agregarResultado("Comienza la simulacion del planificador aplicando SPN");
         agregarResultado("Tiempo: " + this.tiempoActual);
         actualizaColaListos();
 
@@ -155,7 +155,6 @@ public class SPN {
             actualizaColaListos();
             actualizaColaBloqueados();
         }
-        proceso.setEstado(3);
         System.out.println("El proceso P" + proceso.getNumeroProceso() + " está en estado de running");
         agregarResultado("El proceso P" + proceso.getNumeroProceso() + " está en estado de running");
     }

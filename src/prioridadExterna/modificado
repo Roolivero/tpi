@@ -1,0 +1,892 @@
+package prioridadExterna;
+
+import archivos.ArchivoSalida;
+import proceso.Proceso;
+
+import java.awt.image.PackedColorModel;
+import java.util.*;
+
+public class PrioridadExterna {
+    private List<Proceso> procesos;
+    private int TIP;
+    private int TCP;
+    private int TFP;
+    private List<Proceso> colaListos;
+    private List<Proceso> colaBloqueados;
+    private Queue<Proceso> colaFinalizados;
+    private int tiempoActual;
+    public String resultadoArchivo;
+    private ArchivoSalida archivoSalida;
+
+    public PrioridadExterna(List<Integer> listaDatos, List<Proceso> procesos, String rutaArchivo) {
+        this.setProcesos(procesos);
+        this.setTIP(listaDatos.get(1));
+        this.setTCP(listaDatos.get(2));
+        this.setTFP(listaDatos.get(3));
+
+        this.colaListos = new ArrayList<>();
+        this.colaBloqueados = new LinkedList<>();
+        this.colaFinalizados = new LinkedList<>();
+        this.tiempoActual = 0;
+
+        System.out.println("Comienza la simulacion del planificador aplicando Prioridad Externa");
+        System.out.println("Tiempo: " + this.tiempoActual);
+
+        this.resultadoArchivo = "";
+        this.archivoSalida = new ArchivoSalida(rutaArchivo);
+    }
+
+    public void ejecutar() {
+        int cantProcesos = procesos.size();
+        agregarResultado("Comienza la simulacion del planificador aplicando Prioridad Externa");
+        agregarResultado("Tiempo: " + this.tiempoActual);
+        //Si hay procesos nuevos, este metodo ejecuta sus TIPS
+        actualizaColaListos();
+
+        while (this.getColaFinalizados().size() < cantProcesos && this.tiempoActual < 15) {
+            if (this.colaListos.isEmpty()) { //SI NO hay proceso:
+                System.out.println("No hay procesos");
+                this.tiempoActual++; //Avanzo en el tiempo
+                agregarResultado("Tiempo: " + this.tiempoActual);
+                System.out.println("Tiempo: " + this.tiempoActual);
+                System.out.println("CPU Inactiva");
+                actualizaColaListos(); //Actualizo la cola de listos
+                actualizaColaBloqueados(); // Actualizo la cola de bloqueados
+            } else { // Sí HAY procesos:
+                System.out.println("Si hay procesos");
+                mostrarColaListos();
+                Proceso proceso = obtenerProcesoMayorPrioridad(); //Saco al proceso de mayor prioridad de la cola
+                System.out.println("El proceso que se saco es: P" + proceso.getNumeroProceso());
+
+                //Ejecuto su TIP? NO, entonces:
+                if (!proceso.getEjecutoTIP()) {
+                    System.out.println("Ejecutamos el tip en caso de que no haya pasado");
+                    ejecutarTIP(proceso); //Se ejecuta el TIP, se avanza en el tiempo y se actualizan las colas
+                    insertarProceso(proceso); //Lo agrego a la cola de listos
+
+                // SI ejecuto su TIP, entonces pregunto, Hay otros procesos en la cola de listos?
+                } else if (this.colaListos.isEmpty()) { //NO hay otros procesos
+                    System.out.println("Si ejecuto el tip");
+                    System.out.println("revisamos que no haya otros procesos y no hay");
+                    ejecutarRafaga(proceso); //ejecuto la rafaga del proceso
+                    insertarProceso(proceso); //Lo agrego a la cola de listos
+
+                } else { //SI hay otros procesos en la cola de listos
+                    System.out.println("revisamos que no haya otros procesos y si hay");
+                    Proceso pCola = mirarProcesoMayorPrioridad(); //Miro el primer proceso de la cola de listos
+                    //Hay que verificar las prioridades para ver quien continua:
+
+                    // Si Proceso tiene mayor prioridad que pCola:  (proceso > pCola)
+                    if (!(pCola.equals(proceso)) && (pCola.getPrioridad() < proceso.getPrioridad())) {
+                        System.out.println("Proceso P" + proceso.getNumeroProceso() + " > Pcola P: " + pCola.getNumeroProceso());
+                        System.out.println("Proceso: P" + proceso.getNumeroProceso());
+                        System.out.println("Pcola: P" + pCola.getNumeroProceso());
+                        System.out.println("rafagas ejecutadas de pcola: " + pCola.getRafagasEjecutadas());
+                        boolean prueba = pCola.getTerminoRafaga();
+                        System.out.println("pcola ejecuto la rafaga anterior? : " + prueba);
+
+
+                        if (!pCola.getEjecutoTIP()) { // Pcola ejecuto si TIP?
+                            System.out.println("ejecuto el tip de pcola si no lo hizo");
+                            ejecutarTIP(pCola); // no, entonces lo ejecuta
+                            // Continua el proceso
+                            if (proceso.getCantRafagas() == proceso.getRafagasEjecutadas()) { // el Proceso, termino su ultima rafaga?
+                                System.out.println("hacemos el tfp para el proceso");
+                                ejecutarTFP(proceso); //si, entonces ejecuta su TFP
+                                this.colaFinalizados.add(proceso); // Se agrega a la cola de finalizados
+                            } else if (proceso.getTerminoRafaga()) { // el Proceso, termino de ejecutar su ultima rafaga?
+                                System.out.println("ejecutamos tcp para bloqueo");
+                                ejecutarTCP(proceso); //si, entonces ejecuta su TCP
+                                proceso.setTerminoRafaga(false);
+                                this.colaBloqueados.add(proceso);// Se agrega a la cola de finalizados
+                            } else { //no termino de ejecutar su rafaga o no ejecuto ninguna:
+                                System.out.println("ejecutamos bloque de interrupcion");
+                                ejecutarRafaga(proceso);
+                                if (!proceso.getTerminoRafaga()) { //Si no termino su rafaga, lo agrego a la cola de listos
+                                    System.out.println("no termino y lo agrego a la cola de listos");
+                                    insertarProceso(proceso);
+                                }
+                            }
+                        } else { // PCola SI ejecuto su TIP:
+                            if (pCola.getRafagasEjecutadas() == 0) { //Si NO ejecuto ninguna rafaga
+                                //Simplemente continua el proceso
+                                if (proceso.getCantRafagas() == proceso.getRafagasEjecutadas()) { // el Proceso, termino su ultima rafaga?
+                                    System.out.println("hacemos tfp");
+                                    ejecutarTFP(proceso); //si, entonces ejecuta su TFP
+                                    this.colaFinalizados.add(proceso); // Se agrega a la cola de finalizados
+                                    actualizaColaListos();
+                                    actualizaColaBloqueados();
+                                } else if (proceso.getTerminoRafaga()) { // el Proceso, termino de ejecutar su ultima rafaga?
+                                    System.out.println("hacemos tcp de bloqueo");
+                                    ejecutarTCP(proceso); //si, entonces ejecuta su TCP
+                                    proceso.setTerminoRafaga(false);
+                                    this.colaBloqueados.add(proceso);// Se agrega a la cola de bloqueados
+                                    actualizaColaListos();
+                                    actualizaColaBloqueados();
+                                } else { //no termino de ejecutar su rafaga o no ejecuto ninguna:
+                                    System.out.println("hacemos la ejecucion de la rafaga");
+                                    ejecutarRafaga(proceso);
+                                    if (!proceso.getTerminoRafaga()) { //Si no termino su rafaga, lo agrego a la cola de listos
+                                        System.out.println("no termino la rafaga y lo devuelvo a la cola");
+                                        insertarProceso(proceso);
+                                    } else { //Termino de ejecutar su rafaga
+                                        System.out.println("termino su rafaga y hacemos el tcp");
+                                        ejecutarTCP(proceso);
+                                        proceso.setTerminoRafaga(false);
+                                        this.colaBloqueados.add(proceso);// Se agrega a la cola de bloqueados
+                                    }
+                                }
+                            } else if (pCola.getTerminoRafaga()) { //Pcola termino su rafaga?
+                                System.out.println("pcola termino la rafaga y ejecuta el tcp de bloqueo");
+                                ejecutarTCP(pCola); // Sí, entonces ejecuta su TCP
+                                proceso.setTerminoRafaga(false);
+                                this.colaBloqueados.add(pCola); // Agrega a pcola a la cola de bloqueados
+                                ejecutarRafaga(proceso); //continua la ejecucion de proceso
+
+                            } else if (pCola.getSubRafagasEjecutadas() == 0) { //Pcola NO empezo su rafaga:
+                                System.out.println("pcola no empezo la rafaga y lo agrego a la cola");
+                                //ejecutarTCP(pCola); //Ejecuta su TCP
+                                insertarProceso(pCola); //Se agrega a la cola de listos
+                                ejecutarRafaga(proceso); // Continua la ejecucion el proceso
+                            } else if(pCola.getSubRafagasEjecutadas() != 0){ //Pcola empezo alguna rafaga
+                                System.out.println("pcola empezo la rafaga y hacemos el tcp de interrupcion");
+                                ejecutarTCP(pCola); //Ejecuta su TCP
+                                insertarProceso(pCola); //Se agrega a la cola de listos
+                                ejecutarRafaga(proceso); // Continua la ejecucion el proceso
+                            } else if (pCola.getRafagasEjecutadas() == pCola.getCantRafagas()) {  //Pcola termino su ultima rafaga?
+                                System.out.println("hacemos tfp de pcola");
+                                ejecutarTFP(pCola);  // Sí, entonces ejecuta su TFP
+                                this.colaFinalizados.add(pCola); //Se agrega Pcola a la cola de finalizados
+                                this.colaBloqueados.remove(pCola);
+                                ejecutarRafaga(proceso); //Continua la ejecucion del proceso
+                            }
+                        }
+                        // Si pCola tiene mayor prioridad que proceso:  (pCola > proceso)
+                    } else if (!(pCola.equals(proceso)) && (pCola.getPrioridad() > proceso.getPrioridad())) {
+                        System.out.println("Proceso P" + proceso.getNumeroProceso() + " < Pcola P: " + pCola.getNumeroProceso());
+                        System.out.println("Proceso: P" + proceso.getNumeroProceso());
+                        System.out.println("Pcola: P" + pCola.getNumeroProceso());
+
+                        if (!proceso.getEjecutoTIP()) { // Proceso ejecuto si TIP?
+                            System.out.println("vemos si el proceso ejecuto su tip");
+                            ejecutarTIP(proceso); // no, entonces lo ejecuta
+                            // Continua Pcola
+                            if (pCola.getCantRafagas() == pCola.getRafagasEjecutadas()) { // pCola, termino su ultima rafaga?
+                                System.out.println("vemos si pcola termino su rafaga");
+                                ejecutarTFP(pCola); //si, entonces ejecuta su TFP
+                                this.colaFinalizados.add(pCola); // Se agrega a la cola de finalizados
+                                actualizaColaListos();
+                                actualizaColaBloqueados();
+
+                            } else if (pCola.getTerminoRafaga()) { //pCola, termino de ejecutar su ultima rafaga?
+                                System.out.println("ejecutamos tcp de bloqueo");
+                                ejecutarTCP(pCola); //si, entonces ejecuta su TCP
+                                pCola.setTerminoRafaga(false);
+                                this.colaBloqueados.add(pCola);// Se agrega a la cola de finalizados
+                                actualizaColaListos();
+                                actualizaColaBloqueados();
+
+                            } else { //no termino de ejecutar su rafaga o no ejecuto ninguna:
+                                System.out.println("ejecutamos rafaga de pcola");
+                                ejecutarRafaga(pCola);
+                                if (!pCola.getTerminoRafaga()) { //Si no termino su rafaga, lo agrego a la cola de listos
+                                    insertarProceso(pCola); //Se agrega Pcola a la cola de listos
+                                }
+                            }
+
+                        } else { // Proceso SI ejecuto su TIP:
+                            if (proceso.getRafagasEjecutadas() == 0) { //Si NO ejecuto ninguna rafaga
+                                //Simplemente continua Pcola
+                                System.out.println("continua pcola");
+                                if (pCola.getCantRafagas() == pCola.getRafagasEjecutadas()) { // el Proceso, termino su ultima rafaga?
+                                    System.out.println("ejecutamos tfp de pcola");
+                                    ejecutarTFP(pCola); //si, entonces ejecuta su TFP
+                                    this.colaFinalizados.add(pCola); // Se agrega a la cola de finalizados
+                                } else if (pCola.getTerminoRafaga()) { // el Proceso, termino de ejecutar su ultima rafaga?
+                                    System.out.println("ejecutamos tcp de interrupcion de pcola");
+                                    ejecutarTCP(pCola); //si, entonces ejecuta su TCP
+                                    pCola.setTerminoRafaga(false);
+                                    this.colaBloqueados.add(pCola);// Se agrega a la cola de finalizados
+                                } else { //no termino de ejecutar su rafaga o no ejecuto ninguna:
+                                    System.out.println("ejecutamos la rafaga de pcola");
+                                    ejecutarRafaga(pCola);
+                                    if (!pCola.getTerminoRafaga()) { //Si no termino su rafaga, lo agrego a la cola de listos
+                                        System.out.println("no termino la rafaga y lo agrego a la cola");
+                                        insertarProceso(pCola);
+                                    } else { //Termino de ejecutar su rafaga
+                                        System.out.println("ejecutamos el tcp de bloqueo de pcola");
+                                        ejecutarTCP(pCola);
+                                        pCola.setTerminoRafaga(false);
+                                        this.colaBloqueados.add(pCola);// Se agrega a la cola de bloqueados
+                                    }
+                                }
+
+                            } else if (proceso.getTerminoRafaga()) { //Proceso termino su rafaga?
+                                System.out.println("ejecutamos tcp de bloqueo de proceso");
+                                ejecutarTCP(proceso); // Sí, entonces ejecuta su TCP
+                                proceso.setTerminoRafaga(false);
+                                this.colaBloqueados.add(proceso); // Agrega a Proceso a la cola de bloqueados
+                                ejecutarRafaga(pCola); //continua la ejecucion de pcola
+
+                            } else if(proceso.getSubRafagasEjecutadas() == 0){ //Proceso no empezo su rafaga
+                                System.out.println("pcola ejecuta su rafaga");
+                                insertarProceso(proceso); //Se agrega a la cola de listos
+                                ejecutarRafaga(pCola); // Continua la ejecucion de pcola
+                            } else if (proceso.getSubRafagasEjecutadas() != 0) { //Proceso empezo alguna rafaga:
+                                System.out.println("se jecuta el tcp de interrupcion para proceso");
+                                ejecutarTCP(proceso); //Ejecuta su TCP
+                                insertarProceso(proceso); //Se agrega al proceso la cola de listos
+                                ejecutarRafaga(pCola); // Continua la ejecucion el pcola
+
+                            } else if (proceso.getRafagasEjecutadas() == proceso.getCantRafagas()) {  //Proceso termino su ultima rafaga?
+                                System.out.println("se ejecuta el tfp de proceso");
+                                ejecutarTFP(proceso);  // Sí, entonces ejecuta su TFP
+                                this.colaFinalizados.add(proceso); //Se agrega Proceso a la cola de finalizados
+                                this.colaBloqueados.remove(proceso);
+                                ejecutarRafaga(pCola); //Continua la ejecucion del pcola
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void mostrarColaListos() {
+        System.out.println("Cola de procesos listos: ");
+        for (Proceso proceso : this.colaListos) {
+            System.out.println(proceso.getNumeroProceso());
+        }
+    }
+
+    private void ejecutarRafaga(Proceso proceso) {
+        agregarResultado("La duración de la ráfaga del proceso P" + proceso.getNumeroProceso() + " es " + proceso.getDuracionRafaga());
+        System.out.println("La duración de la ráfaga del proceso P" + proceso.getNumeroProceso() + " es " + proceso.getDuracionRafaga());
+        proceso.actualizarRafaga();
+        if (proceso.getSubRafagasEjecutadas() == 0) { //Si termino su rafaga:
+            agregarResultado("Se ejecuta la sub ráfaga " + proceso.getDuracionRafaga() + " del proceso P" + proceso.getNumeroProceso());
+            System.out.println("Se ejecuta la sub ráfaga " + proceso.getDuracionRafaga() + " del proceso P" + proceso.getNumeroProceso());
+            agregarResultado("Se ejecuta la ráfaga número: " + proceso.getRafagasEjecutadas() + " del proceso P" + proceso.getNumeroProceso());
+            System.out.println("Se ejecuta la ráfaga número: " + proceso.getRafagasEjecutadas() + " del proceso P" + proceso.getNumeroProceso());
+            System.out.println("RAFAGA NUMERO: " + proceso.getRafagasEjecutadas());
+            proceso.setTerminoRafaga(true);
+        } else { //No termino su rafaga
+            agregarResultado("Se ejecuta la sub ráfaga " + proceso.getSubRafagasEjecutadas() + " del proceso P" + proceso.getNumeroProceso());
+            System.out.println("Se ejecuta la sub ráfaga " + proceso.getSubRafagasEjecutadas() + " del proceso P" + proceso.getNumeroProceso());
+            proceso.setTerminoRafaga(false);
+        }
+
+        //actualizaColaBloqueados();
+        this.tiempoActual++;
+        System.out.println("Tiempo: " + this.tiempoActual);
+        agregarResultado("Tiempo: " + this.tiempoActual);
+        actualizaColaListos();
+        actualizaColaBloqueados();
+    }
+
+    private void actualizaColaListos() {
+        System.out.println("actualizamos cola de listos");
+        for (Proceso proceso : this.procesos) {
+            if (proceso.getTiempoArribo() == this.tiempoActual &&
+                    !this.colaListos.contains(proceso) &&
+                    !this.colaBloqueados.contains(proceso) &&
+                    !this.colaFinalizados.contains(proceso)) {
+                insertarProceso(proceso);
+                agregarResultado("Llega el proceso P" + proceso.getNumeroProceso());
+                System.out.println("Llega el proceso P" + proceso.getNumeroProceso());
+                ejecutarTIP(proceso);
+            }
+        }
+    }
+
+    private void actualizaColaBloqueados() {
+        System.out.println("actualizamos cola de bloqueados");
+        int indice = 0;
+        for (Proceso proceso : this.colaBloqueados) {
+            if (proceso.getSubBloqueosEjecutados() < proceso.getDuracionBloqueo()) {
+                proceso.actualizarBloqueos();
+                agregarResultado("Se ejecuta el sub bloqueo número " + proceso.getSubBloqueosEjecutados() + " del proceso P" + proceso.getNumeroProceso());
+                System.out.println("Se ejecuta el sub bloqueo número: " + proceso.getSubBloqueosEjecutados() + " del proceso P" + proceso.getNumeroProceso());
+                if(proceso.getSubBloqueosEjecutados() == proceso.getDuracionBloqueo()){
+                    System.out.println("Se ejecuta el sub bloqueo número: " + proceso.getDuracionBloqueo() + " del proceso P" + proceso.getNumeroProceso());
+                }
+            } else if (proceso.getSubBloqueosEjecutados() == proceso.getDuracionBloqueo()) {
+                proceso.actualizarBloqueos();
+                agregarResultado("Se ejecuta el bloqueo número " + proceso.getBloqueosEjecutados() + " del proceso P" + proceso.getNumeroProceso());
+                System.out.println("Se ejecuta el bloqueo número: " + proceso.getBloqueosEjecutados() + " del proceso P" + proceso.getNumeroProceso());
+                Proceso procesoListo = this.colaBloqueados.remove(indice);
+                insertarProceso(procesoListo);
+                agregarResultado("Se agregó el proceso P " + procesoListo.getNumeroProceso() + " a la cola de listos");
+                System.out.println("Se agregó el proceso P " + procesoListo.getNumeroProceso() + " a la cola de listos");
+            }
+            indice++;
+        }
+    }
+
+    private void ejecutarTIP(Proceso proceso) {
+        System.out.println("Se ejecuta el TIP para el proceso P" + proceso.getNumeroProceso());
+        agregarResultado("Se ejecuta el TIP para el proceso P" + proceso.getNumeroProceso());
+        for (int i = 0; i < this.TIP; i++) {
+            tiempoActual++;
+            System.out.println("Tiempo: " + this.tiempoActual);
+            agregarResultado("Tiempo: " + this.tiempoActual);
+            actualizaColaListos();
+            actualizaColaBloqueados();
+        }
+        proceso.setEjecutoTIP(true);
+        System.out.println("El proceso P" + proceso.getNumeroProceso() + " está en estado de running");
+        agregarResultado("El proceso P" + proceso.getNumeroProceso() + " está en estado de running");
+    }
+
+    private void ejecutarTCP(Proceso proceso) {
+        System.out.println("Se ejecuta el TCP para el proceso P" + proceso.getNumeroProceso());
+        agregarResultado("Se ejecuta el TCP para el proceso P" + proceso.getNumeroProceso());
+        for (int i = 0; i < this.TCP; i++) {
+            tiempoActual++;
+            System.out.println("Tiempo: " + this.tiempoActual);
+            agregarResultado("Tiempo: " + this.tiempoActual);
+            actualizaColaListos();
+            actualizaColaBloqueados();
+        }
+        System.out.println("El proceso P" + proceso.getNumeroProceso() + " está en estado de bloqueado");
+        agregarResultado("El proceso P" + proceso.getNumeroProceso() + " está en estado de bloqueado");
+    }
+
+    private void ejecutarTFP(Proceso proceso) {
+        System.out.println("Se ejecuta el TFP para el proceso P" + proceso.getNumeroProceso());
+        agregarResultado("Se ejecuta el TFP para el proceso P" + proceso.getNumeroProceso());
+        for (int i = 0; i < this.TFP; i++) {
+            tiempoActual++;
+            System.out.println("Tiempo: " + this.tiempoActual);
+            agregarResultado("Tiempo: " + this.tiempoActual);
+            actualizaColaListos();
+            actualizaColaBloqueados();
+        }
+        System.out.println("El proceso P" + proceso.getNumeroProceso() + " ha terminado su ejecución");
+        agregarResultado("El proceso P" + proceso.getNumeroProceso() + " ha terminado su ejecución");
+    }
+
+    private void agregarResultado(String resultado) {
+        this.resultadoArchivo += resultado + "\n";
+    }
+
+    private void escribirResultadoEnArchivo() {
+        archivoSalida.escribirDatos(this.resultadoArchivo);
+    }
+
+    // Nuevos métodos para manejar la lista ordenada
+    private void insertarProceso(Proceso nuevoProceso) {
+        int index = Collections.binarySearch(colaListos, nuevoProceso,
+                (p1, p2) -> {
+                    int prioridad = Integer.compare(p2.getPrioridad(), p1.getPrioridad());
+                    if (prioridad != 0) return prioridad;
+                    int comparacionTiempoArribo = Integer.compare(p1.getTiempoArribo(), p2.getTiempoArribo());
+                    if (comparacionTiempoArribo != 0) return comparacionTiempoArribo;
+                    return Integer.compare(p1.getNumeroProceso(), p2.getNumeroProceso());
+                });
+        if (index < 0) {
+            colaListos.add(-index - 1, nuevoProceso);
+        } else {
+            colaListos.add(index, nuevoProceso);
+        }
+    }
+
+    private Proceso obtenerProcesoMayorPrioridad() {
+        return colaListos.isEmpty() ? null : colaListos.remove(0);
+    }
+
+    private Proceso mirarProcesoMayorPrioridad() {
+        return colaListos.isEmpty() ? null : colaListos.get(0);
+    }
+
+    // Getters y Setters
+    public List<Proceso> getColaFinalizados() {
+        return new ArrayList<>(colaFinalizados);
+    }
+
+    public List<Proceso> getColaListos() {
+        return colaListos;
+    }
+
+    public List<Proceso> getColaBloqueados() {
+        return colaBloqueados;
+    }
+
+    public List<Proceso> getProcesos() {
+        return procesos;
+    }
+
+    public void setProcesos(List<Proceso> procesos) {
+        this.procesos = procesos;
+    }
+
+    public int getTIP() {
+        return TIP;
+    }
+
+    public void setTIP(int TIP) {
+        this.TIP = TIP;
+    }
+
+    public int getTCP() {
+        return TCP;
+    }
+
+    public void setTCP(int TCP) {
+        this.TCP = TCP;
+    }
+
+    public int getTFP() {
+        return TFP;
+    }
+
+    public void setTFP(int TFP) {
+        this.TFP = TFP;
+    }
+}
+package prioridadExterna;
+
+import archivos.ArchivoSalida;
+import proceso.Proceso;
+
+import java.awt.image.PackedColorModel;
+import java.util.*;
+
+public class PrioridadExterna {
+    private List<Proceso> procesos;
+    private int TIP;
+    private int TCP;
+    private int TFP;
+    private List<Proceso> colaListos;
+    private List<Proceso> colaBloqueados;
+    private Queue<Proceso> colaFinalizados;
+    private int tiempoActual;
+    public String resultadoArchivo;
+    private ArchivoSalida archivoSalida;
+
+    public PrioridadExterna(List<Integer> listaDatos, List<Proceso> procesos, String rutaArchivo) {
+        this.setProcesos(procesos);
+        this.setTIP(listaDatos.get(1));
+        this.setTCP(listaDatos.get(2));
+        this.setTFP(listaDatos.get(3));
+
+        this.colaListos = new ArrayList<>();
+        this.colaBloqueados = new LinkedList<>();
+        this.colaFinalizados = new LinkedList<>();
+        this.tiempoActual = 0;
+
+        System.out.println("Comienza la simulacion del planificador aplicando Prioridad Externa");
+        System.out.println("Tiempo: " + this.tiempoActual);
+
+        this.resultadoArchivo = "";
+        this.archivoSalida = new ArchivoSalida(rutaArchivo);
+    }
+
+    public void ejecutar() {
+        int cantProcesos = procesos.size();
+        agregarResultado("Comienza la simulacion del planificador aplicando Prioridad Externa");
+        agregarResultado("Tiempo: " + this.tiempoActual);
+        //Si hay procesos nuevos, este metodo ejecuta sus TIPS
+        actualizaColaListos();
+
+        while (this.getColaFinalizados().size() < cantProcesos && this.tiempoActual < 15) {
+            if (this.colaListos.isEmpty()) { //SI NO hay proceso:
+                System.out.println("No hay procesos");
+                this.tiempoActual++; //Avanzo en el tiempo
+                agregarResultado("Tiempo: " + this.tiempoActual);
+                System.out.println("Tiempo: " + this.tiempoActual);
+                System.out.println("CPU Inactiva");
+                actualizaColaListos(); //Actualizo la cola de listos
+                actualizaColaBloqueados(); // Actualizo la cola de bloqueados
+            } else { // Sí HAY procesos:
+                System.out.println("Si hay procesos");
+                mostrarColaListos();
+                Proceso proceso = obtenerProcesoMayorPrioridad(); //Saco al proceso de mayor prioridad de la cola
+                System.out.println("El proceso que se saco es: P" + proceso.getNumeroProceso());
+
+                //Ejecuto su TIP? NO, entonces:
+                if (!proceso.getEjecutoTIP()) {
+                    System.out.println("Ejecutamos el tip en caso de que no haya pasado");
+                    ejecutarTIP(proceso); //Se ejecuta el TIP, se avanza en el tiempo y se actualizan las colas
+                    insertarProceso(proceso); //Lo agrego a la cola de listos
+
+                // SI ejecuto su TIP, entonces pregunto, Hay otros procesos en la cola de listos?
+                } else if (this.colaListos.isEmpty()) { //NO hay otros procesos
+                    System.out.println("Si ejecuto el tip");
+                    System.out.println("revisamos que no haya otros procesos y no hay");
+                    ejecutarRafaga(proceso); //ejecuto la rafaga del proceso
+                    insertarProceso(proceso); //Lo agrego a la cola de listos
+
+                } else { //SI hay otros procesos en la cola de listos
+                    System.out.println("revisamos que no haya otros procesos y si hay");
+                    Proceso pCola = mirarProcesoMayorPrioridad(); //Miro el primer proceso de la cola de listos
+                    //Hay que verificar las prioridades para ver quien continua:
+
+                    // Si Proceso tiene mayor prioridad que pCola:  (proceso > pCola)
+                    if (!(pCola.equals(proceso)) && (pCola.getPrioridad() < proceso.getPrioridad())) {
+                        System.out.println("Proceso P" + proceso.getNumeroProceso() + " > Pcola P: " + pCola.getNumeroProceso());
+                        System.out.println("Proceso: P" + proceso.getNumeroProceso());
+                        System.out.println("Pcola: P" + pCola.getNumeroProceso());
+                        System.out.println("rafagas ejecutadas de pcola: " + pCola.getRafagasEjecutadas());
+                        boolean prueba = pCola.getTerminoRafaga();
+                        System.out.println("pcola ejecuto la rafaga anterior? : " + prueba);
+
+
+                        if (!pCola.getEjecutoTIP()) { // Pcola ejecuto si TIP?
+                            System.out.println("ejecuto el tip de pcola si no lo hizo");
+                            ejecutarTIP(pCola); // no, entonces lo ejecuta
+                            // Continua el proceso
+                            if (proceso.getCantRafagas() == proceso.getRafagasEjecutadas()) { // el Proceso, termino su ultima rafaga?
+                                System.out.println("hacemos el tfp para el proceso");
+                                ejecutarTFP(proceso); //si, entonces ejecuta su TFP
+                                this.colaFinalizados.add(proceso); // Se agrega a la cola de finalizados
+                            } else if (proceso.getTerminoRafaga()) { // el Proceso, termino de ejecutar su ultima rafaga?
+                                System.out.println("ejecutamos tcp para bloqueo");
+                                ejecutarTCP(proceso); //si, entonces ejecuta su TCP
+                                proceso.setTerminoRafaga(false);
+                                this.colaBloqueados.add(proceso);// Se agrega a la cola de finalizados
+                            } else { //no termino de ejecutar su rafaga o no ejecuto ninguna:
+                                System.out.println("ejecutamos bloque de interrupcion");
+                                ejecutarRafaga(proceso);
+                                if (!proceso.getTerminoRafaga()) { //Si no termino su rafaga, lo agrego a la cola de listos
+                                    System.out.println("no termino y lo agrego a la cola de listos");
+                                    insertarProceso(proceso);
+                                }
+                            }
+                        } else { // PCola SI ejecuto su TIP:
+                            if (pCola.getRafagasEjecutadas() == 0) { //Si NO ejecuto ninguna rafaga
+                                //Simplemente continua el proceso
+                                if (proceso.getCantRafagas() == proceso.getRafagasEjecutadas()) { // el Proceso, termino su ultima rafaga?
+                                    System.out.println("hacemos tfp");
+                                    ejecutarTFP(proceso); //si, entonces ejecuta su TFP
+                                    this.colaFinalizados.add(proceso); // Se agrega a la cola de finalizados
+                                    actualizaColaListos();
+                                    actualizaColaBloqueados();
+                                } else if (proceso.getTerminoRafaga()) { // el Proceso, termino de ejecutar su ultima rafaga?
+                                    System.out.println("hacemos tcp de bloqueo");
+                                    ejecutarTCP(proceso); //si, entonces ejecuta su TCP
+                                    proceso.setTerminoRafaga(false);
+                                    this.colaBloqueados.add(proceso);// Se agrega a la cola de bloqueados
+                                    actualizaColaListos();
+                                    actualizaColaBloqueados();
+                                } else { //no termino de ejecutar su rafaga o no ejecuto ninguna:
+                                    System.out.println("hacemos la ejecucion de la rafaga");
+                                    ejecutarRafaga(proceso);
+                                    if (!proceso.getTerminoRafaga()) { //Si no termino su rafaga, lo agrego a la cola de listos
+                                        System.out.println("no termino la rafaga y lo devuelvo a la cola");
+                                        insertarProceso(proceso);
+                                    } else { //Termino de ejecutar su rafaga
+                                        System.out.println("termino su rafaga y hacemos el tcp");
+                                        ejecutarTCP(proceso);
+                                        proceso.setTerminoRafaga(false);
+                                        this.colaBloqueados.add(proceso);// Se agrega a la cola de bloqueados
+                                    }
+                                }
+                            } else if (pCola.getTerminoRafaga()) { //Pcola termino su rafaga?
+                                System.out.println("pcola termino la rafaga y ejecuta el tcp de bloqueo");
+                                ejecutarTCP(pCola); // Sí, entonces ejecuta su TCP
+                                proceso.setTerminoRafaga(false);
+                                this.colaBloqueados.add(pCola); // Agrega a pcola a la cola de bloqueados
+                                ejecutarRafaga(proceso); //continua la ejecucion de proceso
+
+                            } else if (pCola.getSubRafagasEjecutadas() == 0) { //Pcola NO empezo su rafaga:
+                                System.out.println("pcola no empezo la rafaga y lo agrego a la cola");
+                                //ejecutarTCP(pCola); //Ejecuta su TCP
+                                insertarProceso(pCola); //Se agrega a la cola de listos
+                                ejecutarRafaga(proceso); // Continua la ejecucion el proceso
+                            } else if(pCola.getSubRafagasEjecutadas() != 0){ //Pcola empezo alguna rafaga
+                                System.out.println("pcola empezo la rafaga y hacemos el tcp de interrupcion");
+                                ejecutarTCP(pCola); //Ejecuta su TCP
+                                insertarProceso(pCola); //Se agrega a la cola de listos
+                                ejecutarRafaga(proceso); // Continua la ejecucion el proceso
+                            } else if (pCola.getRafagasEjecutadas() == pCola.getCantRafagas()) {  //Pcola termino su ultima rafaga?
+                                System.out.println("hacemos tfp de pcola");
+                                ejecutarTFP(pCola);  // Sí, entonces ejecuta su TFP
+                                this.colaFinalizados.add(pCola); //Se agrega Pcola a la cola de finalizados
+                                this.colaBloqueados.remove(pCola);
+                                ejecutarRafaga(proceso); //Continua la ejecucion del proceso
+                            }
+                        }
+                        // Si pCola tiene mayor prioridad que proceso:  (pCola > proceso)
+                    } else if (!(pCola.equals(proceso)) && (pCola.getPrioridad() > proceso.getPrioridad())) {
+                        System.out.println("Proceso P" + proceso.getNumeroProceso() + " < Pcola P: " + pCola.getNumeroProceso());
+                        System.out.println("Proceso: P" + proceso.getNumeroProceso());
+                        System.out.println("Pcola: P" + pCola.getNumeroProceso());
+
+                        if (!proceso.getEjecutoTIP()) { // Proceso ejecuto si TIP?
+                            System.out.println("vemos si el proceso ejecuto su tip");
+                            ejecutarTIP(proceso); // no, entonces lo ejecuta
+                            // Continua Pcola
+                            if (pCola.getCantRafagas() == pCola.getRafagasEjecutadas()) { // pCola, termino su ultima rafaga?
+                                System.out.println("vemos si pcola termino su rafaga");
+                                ejecutarTFP(pCola); //si, entonces ejecuta su TFP
+                                this.colaFinalizados.add(pCola); // Se agrega a la cola de finalizados
+                                actualizaColaListos();
+                                actualizaColaBloqueados();
+
+                            } else if (pCola.getTerminoRafaga()) { //pCola, termino de ejecutar su ultima rafaga?
+                                System.out.println("ejecutamos tcp de bloqueo");
+                                ejecutarTCP(pCola); //si, entonces ejecuta su TCP
+                                pCola.setTerminoRafaga(false);
+                                this.colaBloqueados.add(pCola);// Se agrega a la cola de finalizados
+                                actualizaColaListos();
+                                actualizaColaBloqueados();
+
+                            } else { //no termino de ejecutar su rafaga o no ejecuto ninguna:
+                                System.out.println("ejecutamos rafaga de pcola");
+                                ejecutarRafaga(pCola);
+                                if (!pCola.getTerminoRafaga()) { //Si no termino su rafaga, lo agrego a la cola de listos
+                                    insertarProceso(pCola); //Se agrega Pcola a la cola de listos
+                                }
+                            }
+
+                        } else { // Proceso SI ejecuto su TIP:
+                            if (proceso.getRafagasEjecutadas() == 0) { //Si NO ejecuto ninguna rafaga
+                                //Simplemente continua Pcola
+                                System.out.println("continua pcola");
+                                if (pCola.getCantRafagas() == pCola.getRafagasEjecutadas()) { // el Proceso, termino su ultima rafaga?
+                                    System.out.println("ejecutamos tfp de pcola");
+                                    ejecutarTFP(pCola); //si, entonces ejecuta su TFP
+                                    this.colaFinalizados.add(pCola); // Se agrega a la cola de finalizados
+                                } else if (pCola.getTerminoRafaga()) { // el Proceso, termino de ejecutar su ultima rafaga?
+                                    System.out.println("ejecutamos tcp de interrupcion de pcola");
+                                    ejecutarTCP(pCola); //si, entonces ejecuta su TCP
+                                    pCola.setTerminoRafaga(false);
+                                    this.colaBloqueados.add(pCola);// Se agrega a la cola de finalizados
+                                } else { //no termino de ejecutar su rafaga o no ejecuto ninguna:
+                                    System.out.println("ejecutamos la rafaga de pcola");
+                                    ejecutarRafaga(pCola);
+                                    if (!pCola.getTerminoRafaga()) { //Si no termino su rafaga, lo agrego a la cola de listos
+                                        System.out.println("no termino la rafaga y lo agrego a la cola");
+                                        insertarProceso(pCola);
+                                    } else { //Termino de ejecutar su rafaga
+                                        System.out.println("ejecutamos el tcp de bloqueo de pcola");
+                                        ejecutarTCP(pCola);
+                                        pCola.setTerminoRafaga(false);
+                                        this.colaBloqueados.add(pCola);// Se agrega a la cola de bloqueados
+                                    }
+                                }
+
+                            } else if (proceso.getTerminoRafaga()) { //Proceso termino su rafaga?
+                                System.out.println("ejecutamos tcp de bloqueo de proceso");
+                                ejecutarTCP(proceso); // Sí, entonces ejecuta su TCP
+                                proceso.setTerminoRafaga(false);
+                                this.colaBloqueados.add(proceso); // Agrega a Proceso a la cola de bloqueados
+                                ejecutarRafaga(pCola); //continua la ejecucion de pcola
+
+                            } else if(proceso.getSubRafagasEjecutadas() == 0){ //Proceso no empezo su rafaga
+                                System.out.println("pcola ejecuta su rafaga");
+                                insertarProceso(proceso); //Se agrega a la cola de listos
+                                ejecutarRafaga(pCola); // Continua la ejecucion de pcola
+                            } else if (proceso.getSubRafagasEjecutadas() != 0) { //Proceso empezo alguna rafaga:
+                                System.out.println("se jecuta el tcp de interrupcion para proceso");
+                                ejecutarTCP(proceso); //Ejecuta su TCP
+                                insertarProceso(proceso); //Se agrega al proceso la cola de listos
+                                ejecutarRafaga(pCola); // Continua la ejecucion el pcola
+
+                            } else if (proceso.getRafagasEjecutadas() == proceso.getCantRafagas()) {  //Proceso termino su ultima rafaga?
+                                System.out.println("se ejecuta el tfp de proceso");
+                                ejecutarTFP(proceso);  // Sí, entonces ejecuta su TFP
+                                this.colaFinalizados.add(proceso); //Se agrega Proceso a la cola de finalizados
+                                this.colaBloqueados.remove(proceso);
+                                ejecutarRafaga(pCola); //Continua la ejecucion del pcola
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void mostrarColaListos() {
+        System.out.println("Cola de procesos listos: ");
+        for (Proceso proceso : this.colaListos) {
+            System.out.println(proceso.getNumeroProceso());
+        }
+    }
+
+    private void ejecutarRafaga(Proceso proceso) {
+        agregarResultado("La duración de la ráfaga del proceso P" + proceso.getNumeroProceso() + " es " + proceso.getDuracionRafaga());
+        System.out.println("La duración de la ráfaga del proceso P" + proceso.getNumeroProceso() + " es " + proceso.getDuracionRafaga());
+        proceso.actualizarRafaga();
+        if (proceso.getSubRafagasEjecutadas() == 0) { //Si termino su rafaga:
+            agregarResultado("Se ejecuta la sub ráfaga " + proceso.getDuracionRafaga() + " del proceso P" + proceso.getNumeroProceso());
+            System.out.println("Se ejecuta la sub ráfaga " + proceso.getDuracionRafaga() + " del proceso P" + proceso.getNumeroProceso());
+            agregarResultado("Se ejecuta la ráfaga número: " + proceso.getRafagasEjecutadas() + " del proceso P" + proceso.getNumeroProceso());
+            System.out.println("Se ejecuta la ráfaga número: " + proceso.getRafagasEjecutadas() + " del proceso P" + proceso.getNumeroProceso());
+            System.out.println("RAFAGA NUMERO: " + proceso.getRafagasEjecutadas());
+            proceso.setTerminoRafaga(true);
+        } else { //No termino su rafaga
+            agregarResultado("Se ejecuta la sub ráfaga " + proceso.getSubRafagasEjecutadas() + " del proceso P" + proceso.getNumeroProceso());
+            System.out.println("Se ejecuta la sub ráfaga " + proceso.getSubRafagasEjecutadas() + " del proceso P" + proceso.getNumeroProceso());
+            proceso.setTerminoRafaga(false);
+        }
+
+        //actualizaColaBloqueados();
+        this.tiempoActual++;
+        System.out.println("Tiempo: " + this.tiempoActual);
+        agregarResultado("Tiempo: " + this.tiempoActual);
+        actualizaColaListos();
+        actualizaColaBloqueados();
+    }
+
+    private void actualizaColaListos() {
+        System.out.println("actualizamos cola de listos");
+        for (Proceso proceso : this.procesos) {
+            if (proceso.getTiempoArribo() == this.tiempoActual &&
+                    !this.colaListos.contains(proceso) &&
+                    !this.colaBloqueados.contains(proceso) &&
+                    !this.colaFinalizados.contains(proceso)) {
+                insertarProceso(proceso);
+                agregarResultado("Llega el proceso P" + proceso.getNumeroProceso());
+                System.out.println("Llega el proceso P" + proceso.getNumeroProceso());
+                ejecutarTIP(proceso);
+            }
+        }
+    }
+
+    private void actualizaColaBloqueados() {
+        System.out.println("actualizamos cola de bloqueados");
+        int indice = 0;
+        for (Proceso proceso : this.colaBloqueados) {
+            if (proceso.getSubBloqueosEjecutados() < proceso.getDuracionBloqueo()) {
+                proceso.actualizarBloqueos();
+                agregarResultado("Se ejecuta el sub bloqueo número " + proceso.getSubBloqueosEjecutados() + " del proceso P" + proceso.getNumeroProceso());
+                System.out.println("Se ejecuta el sub bloqueo número: " + proceso.getSubBloqueosEjecutados() + " del proceso P" + proceso.getNumeroProceso());
+                if(proceso.getSubBloqueosEjecutados() == proceso.getDuracionBloqueo()){
+                    System.out.println("Se ejecuta el sub bloqueo número: " + proceso.getDuracionBloqueo() + " del proceso P" + proceso.getNumeroProceso());
+                }
+            } else if (proceso.getSubBloqueosEjecutados() == proceso.getDuracionBloqueo()) {
+                proceso.actualizarBloqueos();
+                agregarResultado("Se ejecuta el bloqueo número " + proceso.getBloqueosEjecutados() + " del proceso P" + proceso.getNumeroProceso());
+                System.out.println("Se ejecuta el bloqueo número: " + proceso.getBloqueosEjecutados() + " del proceso P" + proceso.getNumeroProceso());
+                Proceso procesoListo = this.colaBloqueados.remove(indice);
+                insertarProceso(procesoListo);
+                agregarResultado("Se agregó el proceso P " + procesoListo.getNumeroProceso() + " a la cola de listos");
+                System.out.println("Se agregó el proceso P " + procesoListo.getNumeroProceso() + " a la cola de listos");
+            }
+            indice++;
+        }
+    }
+
+    private void ejecutarTIP(Proceso proceso) {
+        System.out.println("Se ejecuta el TIP para el proceso P" + proceso.getNumeroProceso());
+        agregarResultado("Se ejecuta el TIP para el proceso P" + proceso.getNumeroProceso());
+        for (int i = 0; i < this.TIP; i++) {
+            tiempoActual++;
+            System.out.println("Tiempo: " + this.tiempoActual);
+            agregarResultado("Tiempo: " + this.tiempoActual);
+            actualizaColaListos();
+            actualizaColaBloqueados();
+        }
+        proceso.setEjecutoTIP(true);
+        System.out.println("El proceso P" + proceso.getNumeroProceso() + " está en estado de running");
+        agregarResultado("El proceso P" + proceso.getNumeroProceso() + " está en estado de running");
+    }
+
+    private void ejecutarTCP(Proceso proceso) {
+        System.out.println("Se ejecuta el TCP para el proceso P" + proceso.getNumeroProceso());
+        agregarResultado("Se ejecuta el TCP para el proceso P" + proceso.getNumeroProceso());
+        for (int i = 0; i < this.TCP; i++) {
+            tiempoActual++;
+            System.out.println("Tiempo: " + this.tiempoActual);
+            agregarResultado("Tiempo: " + this.tiempoActual);
+            actualizaColaListos();
+            actualizaColaBloqueados();
+        }
+        System.out.println("El proceso P" + proceso.getNumeroProceso() + " está en estado de bloqueado");
+        agregarResultado("El proceso P" + proceso.getNumeroProceso() + " está en estado de bloqueado");
+    }
+
+    private void ejecutarTFP(Proceso proceso) {
+        System.out.println("Se ejecuta el TFP para el proceso P" + proceso.getNumeroProceso());
+        agregarResultado("Se ejecuta el TFP para el proceso P" + proceso.getNumeroProceso());
+        for (int i = 0; i < this.TFP; i++) {
+            tiempoActual++;
+            System.out.println("Tiempo: " + this.tiempoActual);
+            agregarResultado("Tiempo: " + this.tiempoActual);
+            actualizaColaListos();
+            actualizaColaBloqueados();
+        }
+        System.out.println("El proceso P" + proceso.getNumeroProceso() + " ha terminado su ejecución");
+        agregarResultado("El proceso P" + proceso.getNumeroProceso() + " ha terminado su ejecución");
+    }
+
+    private void agregarResultado(String resultado) {
+        this.resultadoArchivo += resultado + "\n";
+    }
+
+    private void escribirResultadoEnArchivo() {
+        archivoSalida.escribirDatos(this.resultadoArchivo);
+    }
+
+    // Nuevos métodos para manejar la lista ordenada
+    private void insertarProceso(Proceso nuevoProceso) {
+        int index = Collections.binarySearch(colaListos, nuevoProceso,
+                (p1, p2) -> {
+                    int prioridad = Integer.compare(p2.getPrioridad(), p1.getPrioridad());
+                    if (prioridad != 0) return prioridad;
+                    int comparacionTiempoArribo = Integer.compare(p1.getTiempoArribo(), p2.getTiempoArribo());
+                    if (comparacionTiempoArribo != 0) return comparacionTiempoArribo;
+                    return Integer.compare(p1.getNumeroProceso(), p2.getNumeroProceso());
+                });
+        if (index < 0) {
+            colaListos.add(-index - 1, nuevoProceso);
+        } else {
+            colaListos.add(index, nuevoProceso);
+        }
+    }
+
+    private Proceso obtenerProcesoMayorPrioridad() {
+        return colaListos.isEmpty() ? null : colaListos.remove(0);
+    }
+
+    private Proceso mirarProcesoMayorPrioridad() {
+        return colaListos.isEmpty() ? null : colaListos.get(0);
+    }
+
+    // Getters y Setters
+    public List<Proceso> getColaFinalizados() {
+        return new ArrayList<>(colaFinalizados);
+    }
+
+    public List<Proceso> getColaListos() {
+        return colaListos;
+    }
+
+    public List<Proceso> getColaBloqueados() {
+        return colaBloqueados;
+    }
+
+    public List<Proceso> getProcesos() {
+        return procesos;
+    }
+
+    public void setProcesos(List<Proceso> procesos) {
+        this.procesos = procesos;
+    }
+
+    public int getTIP() {
+        return TIP;
+    }
+
+    public void setTIP(int TIP) {
+        this.TIP = TIP;
+    }
+
+    public int getTCP() {
+        return TCP;
+    }
+
+    public void setTCP(int TCP) {
+        this.TCP = TCP;
+    }
+
+    public int getTFP() {
+        return TFP;
+    }
+
+    public void setTFP(int TFP) {
+        this.TFP = TFP;
+    }
+}
