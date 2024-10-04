@@ -32,8 +32,11 @@ public class Main {
         listaProcesos.add(proceso4);
         listaProcesos.add(proceso5);
 
-        String rutaArvhivoFCFS = "C:\\Users\\oroci\\OneDrive\\Desktop\\archivo_FCFS.txt";;
-        String rutaArvhivoSPN = "C:\\Users\\oroci\\OneDrive\\Desktop\\archivo_SPN.txt";;
+        String rutaArvhivoFCFS = " C:\\Users\\oroci\\OneDrive\\Desktop\\Facu\\3ro\\2do cuatri\\sistemas_operativos\\tpi_so\\src\\archivos\\archivo_FCFS.txt";
+        String rutaArvhivoSPN = "C:\\Users\\oroci\\OneDrive\\Desktop\\Facu\\3ro\\2do cuatri\\sistemas_operativos\\tpi_so\\src\\archivos\\archivo_SPN.txt";
+        String rutaArvhivoPE = "C:\\Users\\oroci\\OneDrive\\Desktop\\Facu\\3ro\\2do cuatri\\sistemas_operativos\\tpi_so\\src\\archivos\\archivo_PE.txt";
+        String rutaArvhivoSRTN = "C:\\Users\\oroci\\OneDrive\\Desktop\\Facu\\3ro\\2do cuatri\\sistemas_operativos\\tpi_so\\src\\archivos\\archivo_SRTN.txt";
+        String rutaArvhivoRR = "C:\\Users\\oroci\\OneDrive\\Desktop\\Facu\\3ro\\2do cuatri\\sistemas_operativos\\tpi_so\\src\\archivos\\archivo_RR.txt";
 
         int opcion = listaDatos.get(0);
         if(opcion == 1){
@@ -47,9 +50,9 @@ public class Main {
         } else if (opcion == 4) {
             SPN spn = new SPN(listaDatos,listaProcesos,rutaArvhivoSPN);
             spn.ejecutar();
-            //spn.ejecutar();
         } else if (opcion == 5) {
-            SRTN srtn = new SRTN (listaDatos);
+            SRTN srtn = new SRTN (listaDatos,listaProcesos,rutaArvhivoSRTN);
+            srtn.ejecutar();
         }
 
     }
