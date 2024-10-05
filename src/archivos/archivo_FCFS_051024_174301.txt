@@ -1,0 +1,248 @@
+Comienza la simulacion del planificador aplicando FCFS
+Tiempo: 0
+Llega el proceso P1
+Se ejecuta el TIP para el proceso P1
+
+Tiempo: 1
+El proceso P1 está en estado de running
+La duración de la ráfaga del proceso P1 es 3
+Se ejecuta la sub ráfaga 1 del proceso P1
+
+Tiempo: 2
+Llega el proceso P2
+Se ejecuta la sub ráfaga 2 del proceso P1
+
+Tiempo: 3
+Se ejecuta la sub ráfaga 3 del proceso P1
+Se ejecuta la ráfaga número: 1 del proceso P1
+
+Tiempo: 4
+Llega el proceso P3
+El proceso P1 entra en la cola de bloqueados
+Se ejecuta el sub bloqueo número 1 del proceso P1
+Se ejecuta el TIP para el proceso P2
+
+Tiempo: 5
+Se ejecuta el sub bloqueo número 2 del proceso P1
+El proceso P2 está en estado de running
+La duración de la ráfaga del proceso P2 es 2
+Se ejecuta la sub ráfaga 1 del proceso P2
+
+Tiempo: 6
+Llega el proceso P4
+Se ejecuta el sub bloqueo número 3 del proceso P1
+Se ejecuta el bloqueo número 1 del proceso P1
+Se agregó el proceso P 1 a la cola de listos
+Se ejecuta la sub ráfaga 2 del proceso P2
+Se ejecuta la ráfaga número: 1 del proceso P2
+
+Tiempo: 7
+El proceso P2 entra en la cola de bloqueados
+Se ejecuta el sub bloqueo número 1 del proceso P2
+Se ejecuta el TIP para el proceso P3
+
+Tiempo: 8
+Llega el proceso P5
+Se ejecuta el sub bloqueo número 2 del proceso P2
+Se ejecuta el bloqueo número 1 del proceso P2
+Se agregó el proceso P 2 a la cola de listos
+El proceso P3 está en estado de running
+La duración de la ráfaga del proceso P3 es 2
+Se ejecuta la sub ráfaga 1 del proceso P3
+
+Tiempo: 9
+Se ejecuta la sub ráfaga 2 del proceso P3
+Se ejecuta la ráfaga número: 1 del proceso P3
+
+Tiempo: 10
+El proceso P3 entra en la cola de bloqueados
+Se ejecuta el sub bloqueo número 1 del proceso P3
+Se ejecuta el TIP para el proceso P4
+
+Tiempo: 11
+Se ejecuta el sub bloqueo número 2 del proceso P3
+Se ejecuta el bloqueo número 1 del proceso P3
+Se agregó el proceso P 3 a la cola de listos
+El proceso P4 está en estado de running
+La duración de la ráfaga del proceso P4 es 4
+Se ejecuta la sub ráfaga 1 del proceso P4
+
+Tiempo: 12
+Se ejecuta la sub ráfaga 2 del proceso P4
+
+Tiempo: 13
+Se ejecuta la sub ráfaga 3 del proceso P4
+
+Tiempo: 14
+Se ejecuta la sub ráfaga 4 del proceso P4
+Se ejecuta la ráfaga número: 1 del proceso P4
+
+Tiempo: 15
+El proceso P4 entra en la cola de bloqueados
+Se ejecuta el sub bloqueo número 1 del proceso P4
+Se ejecuta el TCP para el proceso P1
+
+Tiempo: 16
+Se ejecuta el sub bloqueo número 2 del proceso P4
+El proceso P1 está en estado de bloqueado
+La duración de la ráfaga del proceso P1 es 3
+Se ejecuta la sub ráfaga 1 del proceso P1
+
+Tiempo: 17
+Se ejecuta el sub bloqueo número 3 del proceso P4
+Se ejecuta la sub ráfaga 2 del proceso P1
+
+Tiempo: 18
+Se ejecuta el sub bloqueo número 4 del proceso P4
+Se ejecuta el bloqueo número 1 del proceso P4
+Se agregó el proceso P 4 a la cola de listos
+Se ejecuta la sub ráfaga 3 del proceso P1
+Se ejecuta la ráfaga número: 2 del proceso P1
+
+Tiempo: 19
+Se ejecuta el TFP para el proceso P1
+
+Tiempo: 20
+El proceso P1 entra en la cola de finalizados
+El proceso P1 ha terminado su ejecución
+Se ejecuta el TIP para el proceso P5
+
+Tiempo: 21
+El proceso P5 está en estado de running
+La duración de la ráfaga del proceso P5 es 3
+Se ejecuta la sub ráfaga 1 del proceso P5
+
+Tiempo: 22
+Se ejecuta la sub ráfaga 2 del proceso P5
+
+Tiempo: 23
+Se ejecuta la sub ráfaga 3 del proceso P5
+Se ejecuta la ráfaga número: 1 del proceso P5
+
+Tiempo: 24
+El proceso P5 entra en la cola de bloqueados
+Se ejecuta el sub bloqueo número 1 del proceso P5
+Se ejecuta el TCP para el proceso P2
+
+Tiempo: 25
+Se ejecuta el sub bloqueo número 2 del proceso P5
+El proceso P2 está en estado de bloqueado
+La duración de la ráfaga del proceso P2 es 2
+Se ejecuta la sub ráfaga 1 del proceso P2
+
+Tiempo: 26
+Se ejecuta el sub bloqueo número 3 del proceso P5
+Se ejecuta el bloqueo número 1 del proceso P5
+Se agregó el proceso P 5 a la cola de listos
+Se ejecuta la sub ráfaga 2 del proceso P2
+Se ejecuta la ráfaga número: 2 del proceso P2
+
+Tiempo: 27
+El proceso P2 entra en la cola de bloqueados
+Se ejecuta el sub bloqueo número 1 del proceso P2
+Se ejecuta el TCP para el proceso P3
+
+Tiempo: 28
+Se ejecuta el sub bloqueo número 2 del proceso P2
+Se ejecuta el bloqueo número 2 del proceso P2
+Se agregó el proceso P 2 a la cola de listos
+El proceso P3 está en estado de bloqueado
+La duración de la ráfaga del proceso P3 es 2
+Se ejecuta la sub ráfaga 1 del proceso P3
+
+Tiempo: 29
+Se ejecuta la sub ráfaga 2 del proceso P3
+Se ejecuta la ráfaga número: 2 del proceso P3
+
+Tiempo: 30
+Se ejecuta el TFP para el proceso P3
+
+Tiempo: 31
+El proceso P3 entra en la cola de finalizados
+El proceso P3 ha terminado su ejecución
+Se ejecuta el TCP para el proceso P4
+
+Tiempo: 32
+El proceso P4 está en estado de bloqueado
+La duración de la ráfaga del proceso P4 es 4
+Se ejecuta la sub ráfaga 1 del proceso P4
+
+Tiempo: 33
+Se ejecuta la sub ráfaga 2 del proceso P4
+
+Tiempo: 34
+Se ejecuta la sub ráfaga 3 del proceso P4
+
+Tiempo: 35
+Se ejecuta la sub ráfaga 4 del proceso P4
+Se ejecuta la ráfaga número: 2 del proceso P4
+
+Tiempo: 36
+El proceso P4 entra en la cola de bloqueados
+Se ejecuta el sub bloqueo número 1 del proceso P4
+Se ejecuta el TCP para el proceso P5
+
+Tiempo: 37
+Se ejecuta el sub bloqueo número 2 del proceso P4
+El proceso P5 está en estado de bloqueado
+La duración de la ráfaga del proceso P5 es 3
+Se ejecuta la sub ráfaga 1 del proceso P5
+
+Tiempo: 38
+Se ejecuta el sub bloqueo número 3 del proceso P4
+Se ejecuta la sub ráfaga 2 del proceso P5
+
+Tiempo: 39
+Se ejecuta el sub bloqueo número 4 del proceso P4
+Se ejecuta el bloqueo número 2 del proceso P4
+Se agregó el proceso P 4 a la cola de listos
+Se ejecuta la sub ráfaga 3 del proceso P5
+Se ejecuta la ráfaga número: 2 del proceso P5
+
+Tiempo: 40
+Se ejecuta el TFP para el proceso P5
+
+Tiempo: 41
+El proceso P5 entra en la cola de finalizados
+El proceso P5 ha terminado su ejecución
+Se ejecuta el TCP para el proceso P2
+
+Tiempo: 42
+El proceso P2 está en estado de bloqueado
+La duración de la ráfaga del proceso P2 es 2
+Se ejecuta la sub ráfaga 1 del proceso P2
+
+Tiempo: 43
+Se ejecuta la sub ráfaga 2 del proceso P2
+Se ejecuta la ráfaga número: 3 del proceso P2
+
+Tiempo: 44
+Se ejecuta el TFP para el proceso P2
+
+Tiempo: 45
+El proceso P2 entra en la cola de finalizados
+El proceso P2 ha terminado su ejecución
+Se ejecuta el TCP para el proceso P4
+
+Tiempo: 46
+El proceso P4 está en estado de bloqueado
+La duración de la ráfaga del proceso P4 es 4
+Se ejecuta la sub ráfaga 1 del proceso P4
+
+Tiempo: 47
+Se ejecuta la sub ráfaga 2 del proceso P4
+
+Tiempo: 48
+Se ejecuta la sub ráfaga 3 del proceso P4
+
+Tiempo: 49
+Se ejecuta la sub ráfaga 4 del proceso P4
+Se ejecuta la ráfaga número: 3 del proceso P4
+
+Tiempo: 50
+Se ejecuta el TFP para el proceso P4
+
+Tiempo: 51
+El proceso P4 entra en la cola de finalizados
+El proceso P4 ha terminado su ejecución
+El planificador de procesos terminó exitosamente!

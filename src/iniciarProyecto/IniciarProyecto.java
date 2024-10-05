@@ -19,8 +19,28 @@ public class IniciarProyecto {
         List<Proceso> lista = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivo))) {
             String linea;
+            boolean primeraLinea = true;  // Bandera para saltar la primera línea
             while ((linea = br.readLine()) != null) {
-                System.out.println(linea);
+                if (primeraLinea) {
+                    // Ignorar la primera línea (cabecera)
+                    primeraLinea = false;
+                    continue;
+                }
+
+                // Supongamos que los datos están separados por comas
+                String[] datos = linea.split(",");
+
+                // Parseamos los datos y creamos el objeto Proceso
+                int numeroProceso = Integer.parseInt(datos[0]);
+                int tiempoArribo = Integer.parseInt(datos[1]);
+                int cantRafagas = Integer.parseInt(datos[2]);
+                int duracionRafaga = Integer.parseInt(datos[3]);
+                int duracionBloqueo = Integer.parseInt(datos[4]);
+                int prioridad = Integer.parseInt(datos[5]);
+
+                // Creamos el Proceso y lo añadimos a la lista
+                Proceso proceso = new Proceso(numeroProceso, tiempoArribo, cantRafagas, duracionRafaga, duracionBloqueo, prioridad);
+                lista.add(proceso);
             }
         } catch (IOException e) {
             System.err.println("Error al leer el archivo: " + e.getMessage());

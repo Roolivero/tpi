@@ -6,6 +6,8 @@ import roundRobin.RoundRobin;
 import spn.SPN;
 import srtn.SRTN;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,25 +20,29 @@ public class Main {
         iniciarProyecto.cerrarScanner();
 
         List<Proceso> listaProcesos = new ArrayList<>();
-//        listaProcesos = iniciarProyecto.leerArchivo();
-//
-        Proceso proceso1 = new Proceso(1,0,2,3,3,1);
-        Proceso proceso2 = new Proceso(2,2,3,2,2,2);
-        Proceso proceso3 = new Proceso(3,4,2,2,2,3);
-        Proceso proceso4 = new Proceso(4,6,3,4,4,1);
-        Proceso proceso5 = new Proceso(5,8,2,3,3,2);
+        listaProcesos = iniciarProyecto.leerArchivo();
 
-        listaProcesos.add(proceso1);
-        listaProcesos.add(proceso2);
-        listaProcesos.add(proceso3);
-        listaProcesos.add(proceso4);
-        listaProcesos.add(proceso5);
+        System.out.println("Los procesos que se van a utilizar son: ");
+        for(Proceso proceso : listaProcesos){
+            System.out.println("\n");
+            System.out.println("Proceso: P" + proceso.getNumeroProceso());
+            System.out.println("Tiempo de arribo: " + proceso.getTiempoArribo());
+            System.out.println("Cantidad de rafagas: " + proceso.getCantRafagas());
+            System.out.println("Duracion de cada rafaga: " + proceso.getDuracionRafaga());
+            System.out.println("Duracion del bloqueo: " + proceso.getDuracionBloqueo());
+            System.out.println("Prioridad: " + proceso.getPrioridad());
+        }
 
-        String rutaArvhivoFCFS = " C:\\Users\\oroci\\OneDrive\\Desktop\\Facu\\3ro\\2do cuatri\\sistemas_operativos\\tpi_so\\src\\archivos\\archivo_FCFS.txt";
-        String rutaArvhivoSPN = "C:\\Users\\oroci\\OneDrive\\Desktop\\Facu\\3ro\\2do cuatri\\sistemas_operativos\\tpi_so\\src\\archivos\\archivo_SPN.txt";
-        String rutaArvhivoPE = "C:\\Users\\oroci\\OneDrive\\Desktop\\Facu\\3ro\\2do cuatri\\sistemas_operativos\\tpi_so\\src\\archivos\\archivo_PE.txt";
-        String rutaArvhivoSRTN = "C:\\Users\\oroci\\OneDrive\\Desktop\\Facu\\3ro\\2do cuatri\\sistemas_operativos\\tpi_so\\src\\archivos\\archivo_SRTN.txt";
-        String rutaArvhivoRR = "C:\\Users\\oroci\\OneDrive\\Desktop\\Facu\\3ro\\2do cuatri\\sistemas_operativos\\tpi_so\\src\\archivos\\archivo_RR.txt";
+        // Formatear la fecha y hora actual
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyy_HHmmss");
+        String timestamp = LocalDateTime.now().format(formatter);
+
+        // Crear nombres de archivo con timestamp
+        String rutaArvhivoFCFS = "src\\archivos\\archivo_FCFS_" + timestamp + ".txt";
+        String rutaArvhivoSPN = "src\\archivos\\archivo_SPN_" + timestamp + ".txt";
+        String rutaArvhivoPE = "src\\archivos\\archivo_PE_" + timestamp + ".txt";
+        String rutaArvhivoSRTN = "src\\archivos\\archivo_SRTN_" + timestamp + ".txt";
+        String rutaArvhivoRR = "src\\archivos\\archivo_RR_" + timestamp + ".txt";
 
         int opcion = listaDatos.get(0);
         if(opcion == 1){

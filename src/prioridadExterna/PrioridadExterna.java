@@ -36,7 +36,6 @@ public class PrioridadExterna {
         this.resultadoArchivo = "";
         this.archivoSalida = new ArchivoSalida(rutaArchivo);
 
-
     }
 
     private void mostrarColaListos() {
@@ -85,7 +84,6 @@ public class PrioridadExterna {
                 System.out.println("Se ejecuta el sub bloqueo número: " + proceso.getSubBloqueosEjecutados() + " del proceso P" + proceso.getNumeroProceso());
                 System.out.println("Se ejecutó el bloqueo número: " + proceso.getBloqueosEjecutados() + " del proceso P" + proceso.getNumeroProceso());
                 proceso.setSubBloqueosEjecutados(0);
-
                 // Se almacena un tiempo más para guardar al proceso en la cola de listos
                 tiempoDesbloqueoProcesos.put(proceso, tiempoActual + 1);
                 // Se guarda el proceso en la cola de procesos a desbloquear
@@ -96,7 +94,7 @@ public class PrioridadExterna {
         }
         for (Proceso proceso : procesosADesbloquear) { //Se sacan los procesos necesarios de la cola de bloqueados
             this.colaBloqueados.remove(proceso);
-            System.out.println("El proceso P" + proceso.getNumeroProceso() + " ha terminado su bloqueo y será añadido a la cola de listos en el tiempo " + tiempoDesbloqueoProcesos.get(proceso));
+            System.out.println("El proceso P" + proceso.getNumeroProceso() + " terminó su bloqueo");
         }
 
         // Verificamos si hay algún proceso listo para agregar a la cola de listos.
@@ -111,7 +109,7 @@ public class PrioridadExterna {
         for (Proceso proceso : procesosListosParaDesbloquear) {
             this.colaListos.add(proceso);
             tiempoDesbloqueoProcesos.remove(proceso);
-            System.out.println("Se agregó el proceso P" + proceso.getNumeroProceso() + " a la cola de listos en el tiempo " + tiempoActual);
+            System.out.println("Se agregó el proceso P" + proceso.getNumeroProceso() + " a la cola de listos. ");
         }
     }
 

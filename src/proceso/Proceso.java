@@ -15,6 +15,13 @@ public class Proceso {
     private boolean terminoRafaga;
     private boolean ejecutoTIP;
 
+    //Variables para el archivo de salida
+    private int  trp;
+    private int trn;
+    private int trt;
+    private int tmrt;
+    private int tiempoCPUutilizado;
+
 
     //Constructor
     public Proceso(int numeroProceso, int tiempoArribo, int cantRafagas, int duracionRafaga, int duracionBloqueo, int prioridad) {
@@ -30,6 +37,13 @@ public class Proceso {
         this.setSubBloqueosEjecutados(0);
         this.setTerminoRafaga(false);
         this.setEjecutoTIP(false);
+
+        this.trp = 0;
+        this.trn = 0;
+        this.trt = 0;
+        this.tmrt = 0;
+        this.tiempoCPUutilizado = 0;
+
     }
 
     public void actualizarRafaga(){
@@ -61,6 +75,12 @@ public class Proceso {
     public boolean getTerminoRafaga() {return this.terminoRafaga;}
     public boolean getEjecutoTIP() {return this.ejecutoTIP;}
 
+    public int getTrp() { return trp; }
+    public int getTrn() { return trn; }
+    public int getTrt() { return trt; }
+    public int getTmrt() { return tmrt; }
+    public int getTiempoCPUtilizado () {return tiempoCPUutilizado;}
+
     public void setNombre(int  numeroProceso) {this.numeroProceso = numeroProceso;}
     public void setTiempoArribo(int tiempoArribo) {this.tiempoArribo = tiempoArribo;}
     public void setCantRafagas(int cantRafagas) {this.cantRafagas = cantRafagas;}
@@ -73,6 +93,13 @@ public class Proceso {
     public void setSubBloqueosEjecutados(int subBloqueosEjecutados) {this.subBloqueosEjecutados = subBloqueosEjecutados;}
     public void setTerminoRafaga(boolean terminoRafaga) {this.terminoRafaga = terminoRafaga;}
     public void setEjecutoTIP(boolean ejecutoTIP) {this.ejecutoTIP = ejecutoTIP;}
+
+
+    public void setTrp(int trp) { this.trp = trp; }
+    public void setTrn(int trn) { this.trn = trn; }
+    public void setTrt(int trt) { this.trt = trt; }
+    public void setTmrt(int tmrt) { this.tmrt = tmrt; }
+    public void setTiempoCPUutilizado(int tiempoCPUutilizado) { this.tiempoCPUutilizado = tiempoCPUutilizado; }
 }
 
 

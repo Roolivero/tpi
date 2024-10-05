@@ -34,6 +34,7 @@ public class SPN {
 
             return Integer.compare(p1.getNumeroProceso(), p2.getNumeroProceso());
         });
+
         this.colaBloqueados = new LinkedList<>();
         this.colaFinalizados = new LinkedList<>();
         this.tiempoActual = 0;
@@ -52,24 +53,23 @@ public class SPN {
         System.out.println("TCP: " + this.getTCP());
         System.out.println("TFP: " + this.getTFP());
         int cantProcesos = procesos.size();
-        agregarResultado("Comienza la simulacion del planificador aplicando SPN");
+        agregarResultado("Comienza la simulacion del planificador aplicando FCFS");
         agregarResultado("Tiempo: " + this.tiempoActual);
         actualizaColaListos();
 
         while (this.getColaFinalizados().size() < cantProcesos) {
-            if (this.getColaListos().isEmpty()) { // Si NO hay procesos, avanzo en el tiempo y actualizo las colas
+            if (this.getColaListos().isEmpty()) {  // Si NO hay procesos, avanzo en el tiempo y actualizo las colas
                 this.tiempoActual++;
                 agregarResultado("Tiempo: " + this.tiempoActual);
                 System.out.println("Tiempo: " + this.tiempoActual);
                 actualizaColaListos();
                 actualizaColaBloqueados();
-            } else {
-                Proceso proceso = this.colaListos.poll(); // si SI hay procesos, saco el primero que este en la cola de listos
-                if (proceso.getRafagasEjecutadas() == 0) {  // verifico si ya ejecuto o no su TIP
+            } else { // si SI hay procesos, saco el primero que este en la cola de listos
+                Proceso proceso = this.colaListos.poll();
+                System.out.println("Se saca el proceso: " + proceso.getNumeroProceso());
+                if (proceso.getRafagasEjecutadas() == 0) { // verifico si ya ejecuto o no su TIP
                     ejecutarTIP(proceso);
-                    actualizaColaListos();
-                    actualizaColaBloqueados();
-                }  else {
+                } else {
                     ejecutarTCP(proceso);
                 }
                 ejecutarRafaga(proceso); // ejecuta la rafaga del proceso
@@ -77,8 +77,6 @@ public class SPN {
                     ejecutarTFP(proceso);
                     this.colaBloqueados.remove(proceso);
                     this.colaFinalizados.add(proceso);
-                    agregarResultado("El proceso P" + proceso.getNumeroProceso() + " entra en la cola de finalizados");
-                    System.out.println("El proceso P" + proceso.getNumeroProceso() + " entra en la cola de finalizados");
                     actualizaColaListos();
                     actualizaColaBloqueados();
                 } else {
@@ -93,7 +91,7 @@ public class SPN {
         }
         System.out.println("El planificador de procesos terminó exitosamente!");
         agregarResultado("El planificador de procesos terminó exitosamente!");
-        escribirResultadoEnArchivo();
+        //escribirResultadoEnArchivo();
     }
 
     private void ejecutarRafaga(Proceso proceso) {
@@ -190,6 +188,8 @@ public class SPN {
             actualizaColaListos();
             actualizaColaBloqueados();
         }
+        agregarResultado("El proceso P" + proceso.getNumeroProceso() + " entra en la cola de finalizados");
+        System.out.println("El proceso P" + proceso.getNumeroProceso() + " entra en la cola de finalizados");
         System.out.println("El proceso P" + proceso.getNumeroProceso() + " ha terminado su ejecución");
         agregarResultado("El proceso P" + proceso.getNumeroProceso() + " ha terminado su ejecución");
     }
