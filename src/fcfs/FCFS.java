@@ -28,7 +28,6 @@ public class FCFS {
         this.colaFinalizados = new LinkedList<>();
         this.tiempoActual = 0;
 
-
         System.out.println("Comienza la simulacion del planificador aplicando FCFS");
         System.out.println("Tiempo: " + this.tiempoActual);
 
@@ -58,7 +57,9 @@ public class FCFS {
                     ejecutarTIP(proceso);
                     actualizaColaListos();
                     actualizaColaBloqueados();
-                }
+                } else {
+                   ejecutarTCP(proceso);
+               }
                 ejecutarRafaga(proceso); // ejecuta la rafaga del proceso
                 if (proceso.getRafagasEjecutadas() == proceso.getCantRafagas()) { //Si ya ejecuto todas sus rafagas:
                     ejecutarTFP(proceso);
@@ -69,7 +70,6 @@ public class FCFS {
                     actualizaColaListos();
                     actualizaColaBloqueados();
                 } else {
-                    ejecutarTCP(proceso);
                     agregarResultado("El proceso P" + proceso.getNumeroProceso() + " entra en la cola de bloqueados");
                     System.out.println("El proceso P" + proceso.getNumeroProceso() + " entra en la cola de bloqueados");
                     this.colaListos.remove(proceso);
@@ -81,7 +81,7 @@ public class FCFS {
         }
         System.out.println("El planificador de procesos terminó exitosamente!");
         agregarResultado("El planificador de procesos terminó exitosamente!");
-        escribirResultadoEnArchivo();
+        //escribirResultadoEnArchivo();
     }
 
     private void ejecutarRafaga(Proceso proceso) {
@@ -90,11 +90,12 @@ public class FCFS {
         //System.out.println("La cantidad de rafagas ejecutadas es: " + proceso.getRafagasEjecutadas());
         for (int i = 0; i < proceso.getDuracionRafaga(); i++) {
             proceso.actualizarRafaga();
-            if (proceso.getSubRafagasEjecutadas() == 0) {
+            if (proceso.getSubRafagasEjecutadas() == proceso.getDuracionRafaga()) {
                 agregarResultado("Se ejecuta la sub ráfaga " + proceso.getDuracionRafaga() + " del proceso P" + proceso.getNumeroProceso());
                 System.out.println("Se ejecuta la sub ráfaga " + proceso.getDuracionRafaga() + " del proceso P" + proceso.getNumeroProceso());
                 agregarResultado("Se ejecuta la ráfaga número: " + proceso.getRafagasEjecutadas() + " del proceso P" + proceso.getNumeroProceso());
                 System.out.println("Se ejecuta la ráfaga número: " + proceso.getRafagasEjecutadas() + " del proceso P" + proceso.getNumeroProceso());
+                proceso.setSubRafagasEjecutadas(0);
             } else {
                 agregarResultado("Se ejecuta la sub ráfaga " + proceso.getSubRafagasEjecutadas() + " del proceso P" + proceso.getNumeroProceso());
                 System.out.println("Se ejecuta la sub ráfaga " + proceso.getSubRafagasEjecutadas() + " del proceso P" + proceso.getNumeroProceso());
@@ -120,12 +121,14 @@ public class FCFS {
     private void actualizaColaBloqueados() {
         int indice = 0;
         for (Proceso proceso : this.colaBloqueados) {
+            proceso.actualizarBloqueos();
             if (proceso.getSubBloqueosEjecutados() < proceso.getDuracionBloqueo()) {
-                proceso.actualizarBloqueos();
                 agregarResultado("Se ejecuta el sub bloqueo número " + proceso.getSubBloqueosEjecutados() + " del proceso P" + proceso.getNumeroProceso());
                 System.out.println("Se ejecuta el sub bloqueo número: " + proceso.getSubBloqueosEjecutados() + " del proceso P" + proceso.getNumeroProceso());
             } else if (proceso.getSubBloqueosEjecutados() == proceso.getDuracionBloqueo()) {
-                proceso.actualizarBloqueos();
+                agregarResultado("Se ejecuta el sub bloqueo número " + proceso.getSubBloqueosEjecutados() + " del proceso P" + proceso.getNumeroProceso());
+                System.out.println("Se ejecuta el sub bloqueo número: " + proceso.getSubBloqueosEjecutados() + " del proceso P" + proceso.getNumeroProceso());
+                proceso.setSubBloqueosEjecutados(0);
                 agregarResultado("Se ejecuta el bloqueo número " + proceso.getBloqueosEjecutados() + " del proceso P" + proceso.getNumeroProceso());
                 System.out.println("Se ejecuta el bloqueo número: " + proceso.getBloqueosEjecutados() + " del proceso P" + proceso.getNumeroProceso());
                 Proceso procesoListo = this.colaBloqueados.remove(indice);

@@ -48,6 +48,9 @@ public class SPN {
 
 
     public void ejecutar() {
+        System.out.println("TIP: " + this.getTIP());
+        System.out.println("TCP: " + this.getTCP());
+        System.out.println("TFP: " + this.getTFP());
         int cantProcesos = procesos.size();
         agregarResultado("Comienza la simulacion del planificador aplicando SPN");
         agregarResultado("Tiempo: " + this.tiempoActual);
@@ -66,6 +69,8 @@ public class SPN {
                     ejecutarTIP(proceso);
                     actualizaColaListos();
                     actualizaColaBloqueados();
+                }  else {
+                    ejecutarTCP(proceso);
                 }
                 ejecutarRafaga(proceso); // ejecuta la rafaga del proceso
                 if (proceso.getRafagasEjecutadas() == proceso.getCantRafagas()) { //Si ya ejecuto todas sus rafagas:
@@ -77,7 +82,6 @@ public class SPN {
                     actualizaColaListos();
                     actualizaColaBloqueados();
                 } else {
-                    ejecutarTCP(proceso);
                     agregarResultado("El proceso P" + proceso.getNumeroProceso() + " entra en la cola de bloqueados");
                     System.out.println("El proceso P" + proceso.getNumeroProceso() + " entra en la cola de bloqueados");
                     this.colaListos.remove(proceso);
@@ -98,11 +102,12 @@ public class SPN {
         //System.out.println("La cantidad de rafagas ejecutadas es: " + proceso.getRafagasEjecutadas());
         for (int i = 0; i < proceso.getDuracionRafaga(); i++) {
             proceso.actualizarRafaga();
-            if (proceso.getSubRafagasEjecutadas() == 0) {
+            if (proceso.getSubRafagasEjecutadas() == proceso.getDuracionRafaga()) {
                 agregarResultado("Se ejecuta la sub ráfaga " + proceso.getDuracionRafaga() + " del proceso P" + proceso.getNumeroProceso());
                 System.out.println("Se ejecuta la sub ráfaga " + proceso.getDuracionRafaga() + " del proceso P" + proceso.getNumeroProceso());
                 agregarResultado("Se ejecuta la ráfaga número: " + proceso.getRafagasEjecutadas() + " del proceso P" + proceso.getNumeroProceso());
                 System.out.println("Se ejecuta la ráfaga número: " + proceso.getRafagasEjecutadas() + " del proceso P" + proceso.getNumeroProceso());
+                proceso.setSubRafagasEjecutadas(0);
             } else {
                 agregarResultado("Se ejecuta la sub ráfaga " + proceso.getSubRafagasEjecutadas() + " del proceso P" + proceso.getNumeroProceso());
                 System.out.println("Se ejecuta la sub ráfaga " + proceso.getSubRafagasEjecutadas() + " del proceso P" + proceso.getNumeroProceso());
@@ -128,12 +133,14 @@ public class SPN {
     private void actualizaColaBloqueados() {
         int indice = 0;
         for (Proceso proceso : this.colaBloqueados) {
+            proceso.actualizarBloqueos();
             if (proceso.getSubBloqueosEjecutados() < proceso.getDuracionBloqueo()) {
-                proceso.actualizarBloqueos();
                 agregarResultado("Se ejecuta el sub bloqueo número " + proceso.getSubBloqueosEjecutados() + " del proceso P" + proceso.getNumeroProceso());
                 System.out.println("Se ejecuta el sub bloqueo número: " + proceso.getSubBloqueosEjecutados() + " del proceso P" + proceso.getNumeroProceso());
             } else if (proceso.getSubBloqueosEjecutados() == proceso.getDuracionBloqueo()) {
-                proceso.actualizarBloqueos();
+                agregarResultado("Se ejecuta el sub bloqueo número " + proceso.getSubBloqueosEjecutados() + " del proceso P" + proceso.getNumeroProceso());
+                System.out.println("Se ejecuta el sub bloqueo número: " + proceso.getSubBloqueosEjecutados() + " del proceso P" + proceso.getNumeroProceso());
+                proceso.setSubBloqueosEjecutados(0);
                 agregarResultado("Se ejecuta el bloqueo número " + proceso.getBloqueosEjecutados() + " del proceso P" + proceso.getNumeroProceso());
                 System.out.println("Se ejecuta el bloqueo número: " + proceso.getBloqueosEjecutados() + " del proceso P" + proceso.getNumeroProceso());
                 Proceso procesoListo = this.colaBloqueados.remove(indice);
@@ -201,48 +208,18 @@ public class SPN {
     }
 
     // Getters y Setters
-    public Queue<Proceso> getColaFinalizados() {
-        return colaFinalizados;
-    }
 
-    public Queue<Proceso> getColaListos() {
-        return colaListos;
-    }
+    public int getTIP() {return TIP;}
+    public int getTCP() {return TCP;}
+    public int getTFP() {return TFP;}
+    public Queue<Proceso> getColaFinalizados() {return colaFinalizados;}
+    public Queue<Proceso> getColaListos() {return colaListos;}
+    public List<Proceso> getColaBloqueados() {return colaBloqueados;}
+    public List<Proceso> getProcesos() {return procesos;}
 
-    public List<Proceso> getColaBloqueados() {
-        return colaBloqueados;
-    }
-
-    public List<Proceso> getProcesos() {
-        return procesos;
-    }
-
-    public void setProcesos(List<Proceso> procesos) {
-        this.procesos = procesos;
-    }
-
-    public int getTIP() {
-        return TIP;
-    }
-
-    public void setTIP(int TIP) {
-        this.TIP = TIP;
-    }
-
-    public int getTCP() {
-        return TCP;
-    }
-
-    public void setTCP(int TCP) {
-        this.TCP = TCP;
-    }
-
-    public int getTFP() {
-        return TFP;
-    }
-
-    public void setTFP(int TFP) {
-        this.TFP = TFP;
-    }
+    public void setProcesos(List<Proceso> procesos) {this.procesos = procesos;}
+    public void setTIP(int TIP) {this.TIP = TIP;}
+    public void setTCP(int TCP) {this.TCP = TCP;}
+    public void setTFP(int TFP) {this.TFP = TFP;}
 }
 
