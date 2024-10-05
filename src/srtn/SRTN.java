@@ -72,7 +72,7 @@ public class SRTN {
         });
     }
 
-    private Proceso obtenerProcesoMayorPrioridad() {
+    private Proceso obtenerProcesoMenorTiempoRafaga() {
         return colaListos.isEmpty() ? null : colaListos.removeFirst();
     }
 
@@ -216,7 +216,7 @@ public class SRTN {
                 ordenarColaListos(ultimoProcesoEjecutado);
                 System.out.println("Vemos la cola de listos:");
                 mostrarColaListos();
-                Proceso procesoActual = obtenerProcesoMayorPrioridad();
+                Proceso procesoActual = obtenerProcesoMenorTiempoRafaga();
                 System.out.println("Se saco proceso P" + procesoActual.getNumeroProceso());
                 if(ultimoProcesoEjecutado != null){
                     System.out.println("ultimo proceso ejecutado P" + ultimoProcesoEjecutado.getNumeroProceso());

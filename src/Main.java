@@ -46,7 +46,8 @@ public class Main {
             PrioridadExterna prioridadExterna = new PrioridadExterna(listaDatos,listaProcesos, rutaArvhivoFCFS);
             prioridadExterna.ejecutar();
         } else if (opcion == 3){
-            RoundRobin roundRobin = new RoundRobin(listaDatos);
+            RoundRobin roundRobin = new RoundRobin(listaDatos,listaProcesos, rutaArvhivoRR);
+            //roundRobin.ejecutar();
         } else if (opcion == 4) {
             SPN spn = new SPN(listaDatos,listaProcesos,rutaArvhivoSPN);
             spn.ejecutar();
