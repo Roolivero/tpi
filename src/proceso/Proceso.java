@@ -14,12 +14,10 @@ public class Proceso {
     private int subBloqueosEjecutados;
     private boolean terminoRafaga;
     private boolean ejecutoTIP;
+    private boolean pasoBloqueadoListo;
 
     //Variables para el archivo de salida
     private int  trp;
-    private int trn;
-    private int trt;
-    private int tmrt;
     private int tiempoCPUutilizado;
 
 
@@ -37,11 +35,9 @@ public class Proceso {
         this.setSubBloqueosEjecutados(0);
         this.setTerminoRafaga(false);
         this.setEjecutoTIP(false);
+        this.setPasoBloqueadoListo(false);
 
         this.trp = 0;
-        this.trn = 0;
-        this.trt = 0;
-        this.tmrt = 0;
         this.tiempoCPUutilizado = 0;
 
     }
@@ -74,11 +70,9 @@ public class Proceso {
     public int getSubBloqueosEjecutados() {return subBloqueosEjecutados;}
     public boolean getTerminoRafaga() {return this.terminoRafaga;}
     public boolean getEjecutoTIP() {return this.ejecutoTIP;}
+    public boolean getPasoBloqueadoListo() {return this.pasoBloqueadoListo;}
 
     public int getTrp() { return trp; }
-    public int getTrn() { return trn; }
-    public int getTrt() { return trt; }
-    public int getTmrt() { return tmrt; }
     public int getTiempoCPUtilizado () {return tiempoCPUutilizado;}
 
     public void setNombre(int  numeroProceso) {this.numeroProceso = numeroProceso;}
@@ -93,12 +87,10 @@ public class Proceso {
     public void setSubBloqueosEjecutados(int subBloqueosEjecutados) {this.subBloqueosEjecutados = subBloqueosEjecutados;}
     public void setTerminoRafaga(boolean terminoRafaga) {this.terminoRafaga = terminoRafaga;}
     public void setEjecutoTIP(boolean ejecutoTIP) {this.ejecutoTIP = ejecutoTIP;}
+    public void setPasoBloqueadoListo(boolean pasoBloqueadoListo) {this.pasoBloqueadoListo = pasoBloqueadoListo;}
 
 
     public void setTrp(int trp) { this.trp = trp; }
-    public void setTrn(int trn) { this.trn = trn; }
-    public void setTrt(int trt) { this.trt = trt; }
-    public void setTmrt(int tmrt) { this.tmrt = tmrt; }
     public void setTiempoCPUutilizado(int tiempoCPUutilizado) { this.tiempoCPUutilizado = tiempoCPUutilizado; }
 }
 

@@ -83,6 +83,8 @@ public class FCFS {
         }
         System.out.println("\nEl planificador de procesos terminó exitosamente!");
         agregarResultado("\nEl planificador de procesos terminó exitosamente!");
+        System.out.println("\nLas estadisticas solicitadas son las siguientes: ");
+        agregarResultado("\nLas estadisticas solicitadas son las siguientes: ");
         leerDatosFinales();
         escribirResultadoEnArchivo();
     }
@@ -101,12 +103,12 @@ public class FCFS {
             agregarResultado("Tiempo de retorno normalizado: " + trn);
 
             sumaTRPtotal = sumaTRPtotal + proceso.getTrp();
-
         }
+
         int arribo1erProceso = this.procesos.get(0).getTiempoArribo();
         int trt = this.getTiempoActual() - arribo1erProceso;
-        System.out.println("Tiempo de retorno de la tanda: " + trt);
-        agregarResultado("Tiempo de retorno de la tanda: " + trt);
+        System.out.println("\nTiempo de retorno de la tanda: " + trt);
+        agregarResultado("\nTiempo de retorno de la tanda: " + trt);
 
         System.out.println("cantidad de procesos: " + this.cantProcesos);
         float tmrt = sumaTRPtotal / this.cantProcesos;

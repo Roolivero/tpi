@@ -17,6 +17,7 @@ public class SPN {
     private int tiempoActual;
     public String resultadoArchivo;
     private ArchivoSalida archivoSalida;
+    private int cantProcesos;
 
 
     public SPN(List<Integer> listaDatos, List<Proceso> procesos, String rutaArchivo) {
@@ -45,6 +46,9 @@ public class SPN {
 
         this.resultadoArchivo = "";
         this.archivoSalida = new ArchivoSalida(rutaArchivo);
+
+        this.cantProcesos = this.procesos.size();
+
     }
 
 
@@ -52,16 +56,15 @@ public class SPN {
         System.out.println("TIP: " + this.getTIP());
         System.out.println("TCP: " + this.getTCP());
         System.out.println("TFP: " + this.getTFP());
-        int cantProcesos = procesos.size();
         agregarResultado("Comienza la simulacion del planificador aplicando FCFS");
         agregarResultado("Tiempo: " + this.tiempoActual);
         actualizaColaListos();
 
-        while (this.getColaFinalizados().size() < cantProcesos) {
+        while (this.getColaFinalizados().size() < this.cantProcesos) {
             if (this.getColaListos().isEmpty()) {  // Si NO hay procesos, avanzo en el tiempo y actualizo las colas
                 this.tiempoActual++;
-                agregarResultado("Tiempo: " + this.tiempoActual);
-                System.out.println("Tiempo: " + this.tiempoActual);
+                agregarResultado("\nTiempo: " + this.tiempoActual);
+                System.out.println("\nTiempo: " + this.tiempoActual);
                 actualizaColaListos();
                 actualizaColaBloqueados();
             } else { // si SI hay procesos, saco el primero que este en la cola de listos
@@ -75,6 +78,8 @@ public class SPN {
                 ejecutarRafaga(proceso); // ejecuta la rafaga del proceso
                 if (proceso.getRafagasEjecutadas() == proceso.getCantRafagas()) { //Si ya ejecuto todas sus rafagas:
                     ejecutarTFP(proceso);
+                    int trp = this.getTiempoActual() -proceso.getTiempoArribo();
+                    proceso.setTrp(trp);
                     this.colaBloqueados.remove(proceso);
                     this.colaFinalizados.add(proceso);
                     actualizaColaListos();
@@ -89,9 +94,40 @@ public class SPN {
                 }
             }
         }
-        System.out.println("El planificador de procesos terminó exitosamente!");
-        agregarResultado("El planificador de procesos terminó exitosamente!");
-        //escribirResultadoEnArchivo();
+        System.out.println("\nEl planificador de procesos terminó exitosamente!");
+        agregarResultado("\nEl planificador de procesos terminó exitosamente!");
+        System.out.println("\nLas estadisticas solicitadas son las siguientes: ");
+        agregarResultado("\nLas estadisticas solicitadas son las siguientes: ");
+        leerDatosFinales();
+        escribirResultadoEnArchivo();
+    }
+
+    private void leerDatosFinales(){
+        int sumaTRPtotal = 0;
+        for(Proceso proceso : this.getProcesos()){
+            System.out.println("\nProceso: P" + proceso.getNumeroProceso());
+            agregarResultado("\nProceso: P" + proceso.getNumeroProceso());
+            System.out.println("Tiempo de retorno: " + proceso.getTrp());
+            agregarResultado("Tiempo de retorno: " + proceso.getTrp());
+
+            System.out.println("\nTiempo cpu: " + proceso.getTiempoCPUtilizado());
+            float trn =  (float) proceso.getTrp() / proceso.getTiempoCPUtilizado();
+            System.out.println("Tiempo de retorno normalizado: " + trn);
+            agregarResultado("Tiempo de retorno normalizado: " + trn);
+
+            sumaTRPtotal = sumaTRPtotal + proceso.getTrp();
+        }
+
+        int arribo1erProceso = this.procesos.get(0).getTiempoArribo();
+        int trt = this.getTiempoActual() - arribo1erProceso;
+        System.out.println("Tiempo de retorno de la tanda: " + trt);
+        agregarResultado("Tiempo de retorno de la tanda: " + trt);
+
+        System.out.println("cantidad de procesos: " + this.cantProcesos);
+        float tmrt = sumaTRPtotal / this.cantProcesos;
+        System.out.println("Tiempo medio de retorno de la tanda: " + tmrt);
+        agregarResultado("Tiempo medio de retorno de la tanda: " + tmrt);
+
     }
 
     private void ejecutarRafaga(Proceso proceso) {
@@ -110,9 +146,12 @@ public class SPN {
                 agregarResultado("Se ejecuta la sub ráfaga " + proceso.getSubRafagasEjecutadas() + " del proceso P" + proceso.getNumeroProceso());
                 System.out.println("Se ejecuta la sub ráfaga " + proceso.getSubRafagasEjecutadas() + " del proceso P" + proceso.getNumeroProceso());
             }
+            int tiempoCpuUtilizado = proceso.getTiempoCPUtilizado();
+            tiempoCpuUtilizado ++;
+            proceso.setTiempoCPUutilizado(tiempoCpuUtilizado);
             this.tiempoActual++;
-            System.out.println("Tiempo: " + this.tiempoActual);
-            agregarResultado("Tiempo: " + this.tiempoActual);
+            System.out.println("\nTiempo: " + this.tiempoActual);
+            agregarResultado("\nTiempo: " + this.tiempoActual);
             actualizaColaListos();
             actualizaColaBloqueados();
         }
@@ -155,8 +194,8 @@ public class SPN {
         agregarResultado("Se ejecuta el TIP para el proceso P" + proceso.getNumeroProceso());
         for (int i = 0; i < this.TIP; i++) {
             tiempoActual++;
-            System.out.println("Tiempo: " + this.tiempoActual);
-            agregarResultado("Tiempo: " + this.tiempoActual);
+            System.out.println("\nTiempo: " + this.tiempoActual);
+            agregarResultado("\nTiempo: " + this.tiempoActual);
             actualizaColaListos();
             actualizaColaBloqueados();
         }
@@ -169,8 +208,8 @@ public class SPN {
         agregarResultado("Se ejecuta el TCP para el proceso P" + proceso.getNumeroProceso());
         for (int i = 0; i < this.TCP; i++) {
             tiempoActual++;
-            System.out.println("Tiempo: " + this.tiempoActual);
-            agregarResultado("Tiempo: " + this.tiempoActual);
+            System.out.println("\nTiempo: " + this.tiempoActual);
+            agregarResultado("\nTiempo: " + this.tiempoActual);
             actualizaColaListos();
             actualizaColaBloqueados();
         }
@@ -183,8 +222,8 @@ public class SPN {
         agregarResultado("Se ejecuta el TFP para el proceso P" + proceso.getNumeroProceso());
         for (int i = 0; i < this.TFP; i++) {
             tiempoActual++;
-            System.out.println("Tiempo: " + this.tiempoActual);
-            agregarResultado("Tiempo: " + this.tiempoActual);
+            System.out.println("\nTiempo: " + this.tiempoActual);
+            agregarResultado("\nTiempo: " + this.tiempoActual);
             actualizaColaListos();
             actualizaColaBloqueados();
         }
@@ -192,10 +231,6 @@ public class SPN {
         System.out.println("El proceso P" + proceso.getNumeroProceso() + " entra en la cola de finalizados");
         System.out.println("El proceso P" + proceso.getNumeroProceso() + " ha terminado su ejecución");
         agregarResultado("El proceso P" + proceso.getNumeroProceso() + " ha terminado su ejecución");
-    }
-
-    private void ordenarColaListos(){
-
     }
 
 
@@ -216,6 +251,7 @@ public class SPN {
     public Queue<Proceso> getColaListos() {return colaListos;}
     public List<Proceso> getColaBloqueados() {return colaBloqueados;}
     public List<Proceso> getProcesos() {return procesos;}
+    public int getTiempoActual() {return tiempoActual;}
 
     public void setProcesos(List<Proceso> procesos) {this.procesos = procesos;}
     public void setTIP(int TIP) {this.TIP = TIP;}
