@@ -31,11 +31,6 @@ public class SRTN {
         this.colaFinalizados = new LinkedList<>();
         this.tiempoActual = 0;
 
-        System.out.println("Comienza la simulacion del planificador aplicando Prioridad Externa");
-        agregarResultado("Comienza la simulacion del planificador aplicando Prioridad Externa");
-        System.out.println("\nTiempo: " + this.tiempoActual);
-        agregarResultado("\nTiempo: " + this.tiempoActual);
-
         this.resultadoArchivo = "";
         this.archivoSalida = new ArchivoSalida(rutaArchivo);
 
@@ -61,24 +56,36 @@ public class SRTN {
     }
 
     // Nuevos métodos para manejar la lista ordenada
-    private void ordenarColaListos() {
+    private void ordenarColaListos(Proceso ultimoProcesoEjecutando) {
         colaListos.sort((p1, p2) -> {
-            int prioridad = Integer.compare(p2.getPrioridad(), p1.getPrioridad());
-            if (prioridad != 0) return prioridad;
+            // Calcular el tiempo de rafaga restante para cada proceso
+            int rafagaRestante1 = p1.getDuracionRafaga() - p1.getSubRafagasEjecutadas();
+            int rafagaRestante2 = p2.getDuracionRafaga() - p2.getSubRafagasEjecutadas();
 
-            int comparacionTiempoArribo = Integer.compare(p1.getTiempoArribo(), p2.getTiempoArribo());
-            if (comparacionTiempoArribo != 0) return comparacionTiempoArribo;
-            return Integer.compare(p1.getNumeroProceso(), p2.getNumeroProceso());
+            // Comparar por tiempo de rafaga restante
+            int rafagaRestante = Integer.compare(rafagaRestante1, rafagaRestante2);
+            if (rafagaRestante != 0) return rafagaRestante;
+
+            if(ultimoProcesoEjecutando != null){
+                // En caso de que haya un empate, continúa el último proceso ejecutado si no terminó sus ráfagas
+                if (!ultimoProcesoEjecutando.getTerminoRafaga()) {
+                    // Si el ultimo proceso ejecutado es p1, se debe priorizar p1
+                    if (ultimoProcesoEjecutando == p1) return -1; // p1 va antes
+                    // Si el ultimo proceso ejecutado es p2, se debe priorizar p2
+                    if (ultimoProcesoEjecutando == p2) return 1;  // p2 va antes
+                }
+            }
+            // Si ninguno es el último proceso ejecutado, mantener el orden (empate)
+            return 0;
         });
     }
 
     private Proceso obtenerProcesoMayorPrioridad() {
         return colaListos.isEmpty() ? null : colaListos.removeFirst();
     }
-
     private void actualizaColaListos() {
-        System.out.println("Se actualiza la cola de listos");
-        agregarResultado("Se actualiza la cola de listos");
+//        System.out.println("Se actualiza la cola de listos");
+//        agregarResultado("Se actualiza la cola de listos");
         for (Proceso proceso : this.procesos) {
             if (proceso.getTiempoArribo() == this.tiempoActual &&
                     !this.colaListos.contains(proceso) &&
@@ -142,12 +149,13 @@ public class SRTN {
         for (int i = 0; i < this.TIP; i++) {
             proceso.setEjecutoTIP(true);
             tiempoActual++;
-            System.out.println("\nTiempo: " + this.tiempoActual);
-            agregarResultado("\nTiempo: " + this.tiempoActual);
+            int tiempoSiguiente = this.tiempoActual + 1;
+            System.out.println("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
+            agregarResultado("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
             actualizaColaListos();
             actualizaColaBloqueados();
         }
-        System.out.println("El proceso P" + proceso.getNumeroProceso() + " está en estado de running");
+        //System.out.println("El proceso P" + proceso.getNumeroProceso() + " está en estado de running");
     }
 
     private void ejecutarTCP(Proceso proceso) {
@@ -155,8 +163,9 @@ public class SRTN {
         agregarResultado("Se ejecuta el TCP para el proceso P" + proceso.getNumeroProceso());
         for (int i = 0; i < this.TCP; i++) {
             tiempoActual++;
-            System.out.println("\nTiempo: " + this.tiempoActual);
-            agregarResultado("\nTiempo: " + this.tiempoActual);
+            int tiempoSiguiente = this.tiempoActual + 1;
+            System.out.println("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
+            agregarResultado("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
             actualizaColaListos();
             actualizaColaBloqueados();
         }
@@ -167,8 +176,9 @@ public class SRTN {
         agregarResultado("Se ejecuta el TFP para el proceso P" + proceso.getNumeroProceso());
         for (int i = 0; i < this.TFP; i++) {
             tiempoActual++;
-            System.out.println("\nTiempo: " + this.tiempoActual);
-            agregarResultado("\nTiempo: " + this.tiempoActual);
+            int tiempoSiguiente = this.tiempoActual + 1;
+            System.out.println("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
+            agregarResultado("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
             actualizaColaListos();
             actualizaColaBloqueados();
         }
@@ -195,11 +205,12 @@ public class SRTN {
         tiempoCpuUtilizado ++;
         proceso.setTiempoCPUutilizado(tiempoCpuUtilizado);
         this.tiempoActual++;
-        System.out.println("\nTiempo: " + this.tiempoActual);
-        agregarResultado("\nTiempo: " + this.tiempoActual);
+        int tiempoSiguiente = this.tiempoActual + 1;
+        System.out.println("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
+        agregarResultado("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
         actualizaColaListos();
         actualizaColaBloqueados();
-        mostrarColaListos();
+        //mostrarColaListos();
     }
 
 
@@ -233,40 +244,45 @@ public class SRTN {
             agregarResultado("Prioridad: " + proceso.getPrioridad());
         }
 
-
+        System.out.println("\nComienza la simulacion del planificador aplicando SRTN");
+        agregarResultado("\nComienza la simulacion del planificador aplicando SRTN");
+        int tiempoSiguiente = this.tiempoActual + 1;
+        System.out.println("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
+        agregarResultado("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
         actualizaColaListos();
 
         //Almacena cual fue el ultimo proceso en ejecutarse, al principio es nulo
         Proceso ultimoProcesoEjecutado = null;
-        mostrarColaListos();
+        // mostrarColaListos();
 
         while (this.getColaFinalizados().size() < this.cantProcesos ) {
             if (this.colaListos.isEmpty()) { //SI NO hay proceso:
                 System.out.println("\nla CPU esta inactiva");
                 agregarResultado("\nla CPU esta inactiva");
                 this.tiempoActual++; //Avanzo en el tiempo
-                System.out.println("\nTiempo: " + this.tiempoActual);
-                agregarResultado("\nTiempo: " + this.tiempoActual);
+                tiempoSiguiente = this.tiempoActual + 1;
+                System.out.println("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
+                agregarResultado("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
                 actualizaColaListos(); //Actualizo la cola de listos
-                mostrarColaListos();
+                //    mostrarColaListos();
                 actualizaColaBloqueados(); // Actualizo la cola de bloqueados
-                ordenarColaListos();
+                ordenarColaListos(ultimoProcesoEjecutado);
 
             } else { // Sí HAY procesos:
-                ordenarColaListos();
+                ordenarColaListos(ultimoProcesoEjecutado);
                 Proceso procesoActual = obtenerProcesoMayorPrioridad();
-                System.out.println("Se saco proceso P" + procesoActual.getNumeroProceso());
-                agregarResultado("Se saco proceso P" + procesoActual.getNumeroProceso());
+//                System.out.println("Se saco proceso P" + procesoActual.getNumeroProceso());
+//                agregarResultado("Se saco proceso P" + procesoActual.getNumeroProceso());
 
                 // Pregunto si hay interrupciones
                 //Si se cumple que el último proceso ejecutado no es nulo, que es distinto del proceso actual y
                 // que el proceso actual tiene mayor prioridad que el ultimo proceso ejecutado entonces surge una interrupcion
                 // Si los dos tienen la misma prioirdad, contuinua el ultimo que se estaba ejecutando
 
-                if (ultimoProcesoEjecutado != null){
-                    System.out.println("Ultimo P ejecutado P" + ultimoProcesoEjecutado.getNumeroProceso());
-                    agregarResultado("Ultimo P ejecutado P" + ultimoProcesoEjecutado.getNumeroProceso());
-                }
+//                if (ultimoProcesoEjecutado != null){
+//                    System.out.println("Ultimo P ejecutado P" + ultimoProcesoEjecutado.getNumeroProceso());
+//                    agregarResultado("Ultimo P ejecutado P" + ultimoProcesoEjecutado.getNumeroProceso());
+//                }
 
                 if((ultimoProcesoEjecutado != null )&&( procesoActual != ultimoProcesoEjecutado)
                         && (procesoActual.getPrioridad() > ultimoProcesoEjecutado.getPrioridad())){
@@ -275,9 +291,9 @@ public class SRTN {
 
                     //Devuelvo el ultimo proceso ejecutado a la cola de listos
                     //this.colaListos.add(ultimoProcesoEjecutado);
-                    System.out.println("El ultimo proceso ejecutado, P" + ultimoProcesoEjecutado.getNumeroProceso() + " vuelve a la cola de listos");
-                    agregarResultado("El ultimo proceso ejecutado, P" + ultimoProcesoEjecutado.getNumeroProceso() + " vuelve a la cola de listos");
-                    mostrarColaListos();
+//                    System.out.println("El ultimo proceso ejecutado, P" + ultimoProcesoEjecutado.getNumeroProceso() + " vuelve a la cola de listos");
+//                    agregarResultado("El ultimo proceso ejecutado, P" + ultimoProcesoEjecutado.getNumeroProceso() + " vuelve a la cola de listos");
+                    //      mostrarColaListos();
                     if (!procesoActual.getEjecutoTIP()) { // verifico si ya ejecuto o no su TIP
                         ejecutarTIP(procesoActual);
                         this.colaListos.add(procesoActual);
@@ -298,11 +314,11 @@ public class SRTN {
                     System.out.println("No hay interrupcion");
                     if (!procesoActual.getEjecutoTIP()) { // verifico si ya ejecuto o no su TIP
                         ejecutarTIP(procesoActual);
-                        System.out.println("El proceso P " + procesoActual.getNumeroProceso() + " vuelve a la cola de listos");
-                        agregarResultado("El proceso P " + procesoActual.getNumeroProceso() + " vuelve a la cola de listos");
+//                        System.out.println("El proceso P " + procesoActual.getNumeroProceso() + " vuelve a la cola de listos");
+//                        agregarResultado("El proceso P " + procesoActual.getNumeroProceso() + " vuelve a la cola de listos");
                         this.colaListos.add(procesoActual); //Vuelve a la cola de listos
                         procesoActual.setPasoBloqueadoListo(false);
-                        ordenarColaListos(); // Se ordena la cola
+                        ordenarColaListos(ultimoProcesoEjecutado); // Se ordena la cola
 
                         // Si se da el caso que:
                         // El proceso no empezo a ejecutar una de sus rafagas y que es diferente al proceso actual o que
@@ -314,11 +330,11 @@ public class SRTN {
                             && procesoActual.getSubRafagasEjecutadas() == 0 ))){
 
                         ejecutarTCP(procesoActual);
-                        System.out.println("El proceso P " + procesoActual.getNumeroProceso() + " vuelve a la cola de listos");
-                        agregarResultado("El proceso P " + procesoActual.getNumeroProceso() + " vuelve a la cola de listos");
+//                        System.out.println("El proceso P " + procesoActual.getNumeroProceso() + " vuelve a la cola de listos");
+//                        agregarResultado("El proceso P " + procesoActual.getNumeroProceso() + " vuelve a la cola de listos");
                         this.colaListos.add(procesoActual); //Vuelve a la cola de listos
                         procesoActual.setPasoBloqueadoListo(false);
-                        ordenarColaListos(); // Se ordena la cola
+                        ordenarColaListos(ultimoProcesoEjecutado); // Se ordena la cola
                     } else if (!procesoActual.getTerminoRafaga()) { // Si no termino de ejecutar una rafaga o si todavia no empezo a hacerlo
                         //Ejecuta la rafaga del proceso actual
                         ejecutarRafaga(procesoActual);
@@ -326,18 +342,18 @@ public class SRTN {
 
                         //Si ejecuto todas sus rafagas
                         if(procesoActual.getRafagasEjecutadas() == procesoActual.getCantRafagas()){
-                            System.out.println("El proceso P " + procesoActual.getNumeroProceso() +" ejecuta su TFP");
-                            agregarResultado("El proceso P " + procesoActual.getNumeroProceso() +" ejecuta su TFP");
+//                            System.out.println("El proceso P " + procesoActual.getNumeroProceso() +" ejecuta su TFP");
+//                            agregarResultado("El proceso P " + procesoActual.getNumeroProceso() +" ejecuta su TFP");
                             ejecutarTFP(procesoActual); //ejecuta su TFP
                             //TRP para los datos finales
                             int trp = this.getTiempoActual() -procesoActual.getTiempoArribo();
                             procesoActual.setTrp(trp);
                             this.colaFinalizados.add(procesoActual);
-                            mostrarColaListos();
+                            //  mostrarColaListos();
                             System.out.println("El proceso actual P" + procesoActual.getNumeroProceso() + "se agrega a la cola de finalizados");
                             agregarResultado("El proceso actual P" + procesoActual.getNumeroProceso() + "se agrega a la cola de finalizados");
                             procesoActual.setTerminoRafaga(false);
-                            ordenarColaListos();
+                            ordenarColaListos(ultimoProcesoEjecutado);
 
                             //Si termino de ejecutar una rafaga completa, y no es la ultima
                         } else if (procesoActual.getTerminoRafaga()) {
@@ -352,16 +368,16 @@ public class SRTN {
                             actualizaColaListos();
 
                         } else {
-                            System.out.println("El proceso P " + procesoActual.getNumeroProceso() +" pasa a la cola de listos");
-                            agregarResultado("El proceso P " + procesoActual.getNumeroProceso() +" pasa a la cola de listos");
+//                            System.out.println("El proceso P " + procesoActual.getNumeroProceso() +" pasa a la cola de listos");
+//                            agregarResultado("El proceso P " + procesoActual.getNumeroProceso() +" pasa a la cola de listos");
                             this.colaListos.add(procesoActual); //Vuelve a la cola de listos
-                            ordenarColaListos(); // Se ordena la cola
+                            ordenarColaListos(ultimoProcesoEjecutado); // Se ordena la cola
                         }
                     } else {
-                        System.out.println("El proceso P " + procesoActual.getNumeroProceso() +" pasa a la cola de listos");
-                        agregarResultado("El proceso P " + procesoActual.getNumeroProceso() +" pasa a la cola de listos");
+//                        System.out.println("El proceso P " + procesoActual.getNumeroProceso() +" pasa a la cola de listos");
+//                        agregarResultado("El proceso P " + procesoActual.getNumeroProceso() +" pasa a la cola de listos");
                         this.colaListos.add(procesoActual); //Vuelve a la cola de listos
-                        ordenarColaListos(); // Se ordena la cola
+                        ordenarColaListos(ultimoProcesoEjecutado); // Se ordena la cola
                     }
                 }
                 ultimoProcesoEjecutado = procesoActual;

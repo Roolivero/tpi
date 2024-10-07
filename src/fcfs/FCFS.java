@@ -29,9 +29,6 @@ public class FCFS {
         this.colaFinalizados = new LinkedList<>();
         this.tiempoActual = 0;
 
-        System.out.println("Comienza la simulacion del planificador aplicando FCFS");
-        System.out.println("Tiempo: " + this.tiempoActual);
-
         this.resultadoArchivo = "";
         this.archivoSalida = new ArchivoSalida(rutaArchivo);
 
@@ -69,20 +66,24 @@ public class FCFS {
         }
 
         agregarResultado("\nComienza la simulacion del planificador aplicando FCFS");
-        agregarResultado("\nTiempo: " + this.tiempoActual);
+        int tiempoSiguiente = this.tiempoActual + 1;
+        System.out.println("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
+        agregarResultado("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
         actualizaColaListos();
 
 
         while (this.getColaFinalizados().size() < cantProcesos) {
             if (this.getColaListos().isEmpty()) {  // Si NO hay procesos, avanzo en el tiempo y actualizo las colas
                 this.tiempoActual++;
-                agregarResultado("\nTiempo: " + this.tiempoActual);
-                System.out.println("\nTiempo: " + this.tiempoActual);
+                tiempoSiguiente = this.tiempoActual + 1;
+                System.out.println("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
+                agregarResultado("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
                 actualizaColaListos();
                 actualizaColaBloqueados();
             } else { // si SI hay procesos, saco el primero que este en la cola de listos
                     Proceso proceso = this.colaListos.poll();
                     System.out.println("Se saca el proceso: " + proceso.getNumeroProceso());
+                    agregarResultado("Se saca el proceso: " + proceso.getNumeroProceso());
 
                if (proceso.getRafagasEjecutadas() == 0) { // verifico si ya ejecuto o no su TIP
                     ejecutarTIP(proceso);
@@ -149,6 +150,11 @@ public class FCFS {
         System.out.println("La duración de la ráfaga del proceso P" + proceso.getNumeroProceso() + " es " + proceso.getDuracionRafaga());
         //System.out.println("La cantidad de rafagas ejecutadas es: " + proceso.getRafagasEjecutadas());
         for (int i = 0; i < proceso.getDuracionRafaga(); i++) {
+            this.tiempoActual++;
+            int tiempoSiguiente = this.tiempoActual + 1;
+            System.out.println("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
+            agregarResultado("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
+
             proceso.actualizarRafaga();
             if (proceso.getSubRafagasEjecutadas() == proceso.getDuracionRafaga()) {
                 agregarResultado("Se ejecuta la sub ráfaga " + proceso.getDuracionRafaga() + " del proceso P" + proceso.getNumeroProceso());
@@ -163,9 +169,6 @@ public class FCFS {
             int tiempoCpuUtilizado = proceso.getTiempoCPUtilizado();
             tiempoCpuUtilizado ++;
             proceso.setTiempoCPUutilizado(tiempoCpuUtilizado);
-            this.tiempoActual++;
-            System.out.println("\nTiempo: " + this.tiempoActual);
-            agregarResultado("\nTiempo: " + this.tiempoActual);
             actualizaColaListos();
             actualizaColaBloqueados();
         }
@@ -208,8 +211,10 @@ public class FCFS {
         agregarResultado("Se ejecuta el TIP para el proceso P" + proceso.getNumeroProceso());
         for (int i = 0; i < this.TIP; i++) {
             this.tiempoActual++;
-            System.out.println("\nTiempo: " + this.tiempoActual);
-            agregarResultado("\nTiempo: " + this.tiempoActual);
+            int tiempoSiguiente = this.tiempoActual + 1;
+            System.out.println("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
+            agregarResultado("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
+
             actualizaColaListos();
             actualizaColaBloqueados();
         }
@@ -222,8 +227,10 @@ public class FCFS {
         agregarResultado("Se ejecuta el TCP para el proceso P" + proceso.getNumeroProceso());
         for (int i = 0; i < this.TCP; i++) {
             tiempoActual++;
-            System.out.println("\nTiempo: " + this.tiempoActual);
-            agregarResultado("\nTiempo: " + this.tiempoActual);
+            int tiempoSiguiente = this.tiempoActual + 1;
+            System.out.println("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
+            agregarResultado("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
+
             actualizaColaListos();
             actualizaColaBloqueados();
         }
@@ -236,8 +243,10 @@ public class FCFS {
         agregarResultado("Se ejecuta el TFP para el proceso P" + proceso.getNumeroProceso());
         for (int i = 0; i < this.TFP; i++) {
             tiempoActual++;
-            System.out.println("\nTiempo: " + this.tiempoActual);
-            agregarResultado("\nTiempo: " + this.tiempoActual);
+            int tiempoSiguiente = this.tiempoActual + 1;
+            System.out.println("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
+            agregarResultado("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
+
             actualizaColaListos();
             actualizaColaBloqueados();
         }

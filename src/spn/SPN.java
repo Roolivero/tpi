@@ -30,10 +30,7 @@ public class SPN {
             int comparacionRafaga = Integer.compare(p1.getDuracionRafaga(), p2.getDuracionRafaga());
             if (comparacionRafaga != 0) return comparacionRafaga;
 
-            int comparacionTiempoArribo = Integer.compare(p1.getTiempoArribo(), p2.getTiempoArribo());
-            if (comparacionTiempoArribo != 0) return comparacionTiempoArribo;
-
-            return Integer.compare(p1.getNumeroProceso(), p2.getNumeroProceso());
+            return Integer.compare(p1.getTiempoArribo(), p2.getTiempoArribo());
         });
 
         this.colaBloqueados = new LinkedList<>();
@@ -78,17 +75,21 @@ public class SPN {
             agregarResultado("Prioridad: " + proceso.getPrioridad());
         }
 
-        System.out.println("Comienza la simulacion del planificador aplicando SPN");
-        System.out.println("Tiempo: " + this.tiempoActual);
+        System.out.println("\nComienza la simulacion del planificador aplicando SPN");
         agregarResultado("\nComienza la simulacion del planificador aplicando SPN");
-        agregarResultado("Tiempo: " + this.tiempoActual);
+        int tiempoSiguiente = this.tiempoActual + 1;
+        System.out.println("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
+        agregarResultado("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
+
         actualizaColaListos();
 
         while (this.getColaFinalizados().size() < this.cantProcesos) {
+            System.out.println();
             if (this.getColaListos().isEmpty()) {  // Si NO hay procesos, avanzo en el tiempo y actualizo las colas
                 this.tiempoActual++;
-                agregarResultado("\nTiempo: " + this.tiempoActual);
-                System.out.println("\nTiempo: " + this.tiempoActual);
+                tiempoSiguiente = this.tiempoActual + 1;
+                System.out.println("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
+                agregarResultado("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
                 actualizaColaListos();
                 actualizaColaBloqueados();
             } else { // si SI hay procesos, saco el primero que este en la cola de listos
@@ -174,8 +175,9 @@ public class SPN {
             tiempoCpuUtilizado ++;
             proceso.setTiempoCPUutilizado(tiempoCpuUtilizado);
             this.tiempoActual++;
-            System.out.println("\nTiempo: " + this.tiempoActual);
-            agregarResultado("\nTiempo: " + this.tiempoActual);
+            int tiempoSiguiente = this.tiempoActual + 1;
+            System.out.println("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
+            agregarResultado("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
             actualizaColaListos();
             actualizaColaBloqueados();
         }
@@ -218,8 +220,9 @@ public class SPN {
         agregarResultado("Se ejecuta el TIP para el proceso P" + proceso.getNumeroProceso());
         for (int i = 0; i < this.TIP; i++) {
             tiempoActual++;
-            System.out.println("\nTiempo: " + this.tiempoActual);
-            agregarResultado("\nTiempo: " + this.tiempoActual);
+            int tiempoSiguiente = this.tiempoActual + 1;
+            System.out.println("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
+            agregarResultado("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
             actualizaColaListos();
             actualizaColaBloqueados();
         }
@@ -232,8 +235,9 @@ public class SPN {
         agregarResultado("Se ejecuta el TCP para el proceso P" + proceso.getNumeroProceso());
         for (int i = 0; i < this.TCP; i++) {
             tiempoActual++;
-            System.out.println("\nTiempo: " + this.tiempoActual);
-            agregarResultado("\nTiempo: " + this.tiempoActual);
+            int tiempoSiguiente = this.tiempoActual + 1;
+            System.out.println("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
+            agregarResultado("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
             actualizaColaListos();
             actualizaColaBloqueados();
         }
@@ -246,8 +250,9 @@ public class SPN {
         agregarResultado("Se ejecuta el TFP para el proceso P" + proceso.getNumeroProceso());
         for (int i = 0; i < this.TFP; i++) {
             tiempoActual++;
-            System.out.println("\nTiempo: " + this.tiempoActual);
-            agregarResultado("\nTiempo: " + this.tiempoActual);
+            int tiempoSiguiente = this.tiempoActual + 1;
+            System.out.println("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
+            agregarResultado("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
             actualizaColaListos();
             actualizaColaBloqueados();
         }

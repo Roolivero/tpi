@@ -34,9 +34,6 @@ public class RoundRobin {
         this.resultadoArchivo = "";
         this.archivoSalida = new ArchivoSalida(rutaArchivo);
 
-        System.out.println("Comienza la simulacion del planificador aplicando Round Robin");
-        System.out.println("Tiempo: " + this.tiempoActual);
-
         this.cantProcesos = this.procesos.size();
 
 
@@ -73,19 +70,21 @@ public class RoundRobin {
         }
 
         System.out.println("Comienza la simulacion del planificador aplicando Round Robin");
-        System.out.println("Tiempo: " + this.tiempoActual);
         agregarResultado("\nComienza la simulacion del planificador aplicando Round Robin");
-        agregarResultado("\nTiempo: " + this.tiempoActual);
+        int tiempoSiguiente = this.tiempoActual + 1;
+        System.out.println("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
+        agregarResultado("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
 
         actualizaColaListos();
 
         while (this.getColaFinalizados().size() < cantProcesos) {
-            if (this.getColaListos().isEmpty()) {  // Si NO hay procesos, avanzo en el tiempo y actualizo las colas
-                this.tiempoActual++;
-                agregarResultado("\nTiempo: " + this.tiempoActual);
-                System.out.println("\nTiempo: " + this.tiempoActual);
+            if (this.getColaListos().isEmpty()) {// Si NO hay procesos, avanzo en el tiempo y actualizo las colas
                 actualizaColaListos();
                 actualizaColaBloqueados();
+                this.tiempoActual++;
+                tiempoSiguiente = this.tiempoActual + 1;
+                System.out.println("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
+                agregarResultado("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
 
             } else { // si SI hay procesos, saco el primero que este en la cola de listos
                 Proceso proceso = this.colaListos.poll();
@@ -99,7 +98,6 @@ public class RoundRobin {
                         (this.colaFinalizados.size() == (this.cantProcesos - 1))){
                     ejecutarTCP(proceso);
                 }
-
                 ejecutarRafaga(proceso); // ejecuta la rafaga del proceso
                 if (proceso.getRafagasEjecutadas() == proceso.getCantRafagas()) { //Si ya ejecuto todas sus rafagas:
                     ejecutarTFP(proceso);
@@ -111,12 +109,12 @@ public class RoundRobin {
                     actualizaColaBloqueados();
                 //Si no ejecuto todas sus rafagas:
                 } else if (proceso.getSubRafagasEjecutadas() == 0 && proceso.getRafagasEjecutadas() != 0) {
-                    actualizaColaListos();
-                    actualizaColaBloqueados();
                     agregarResultado("El proceso P" + proceso.getNumeroProceso() + " entra en la cola de bloqueados");
                     System.out.println("El proceso P" + proceso.getNumeroProceso() + " entra en la cola de bloqueados");
                     this.colaListos.remove(proceso);
                     this.colaBloqueados.add(proceso);
+                    actualizaColaListos();
+                    actualizaColaBloqueados();
                 } else { //Si le qudan rafagas por ejecutar, pero se quedo sin quantum vuelve a la cola de listos
                     this.getColaListos().add(proceso);
                 }
@@ -162,12 +160,9 @@ public class RoundRobin {
 //        agregarResultado("La duración de la ráfaga del proceso P" + proceso.getNumeroProceso() + " es " + proceso.getDuracionRafaga());
 //        System.out.println("La duración de la ráfaga del proceso P" + proceso.getNumeroProceso() + " es " + proceso.getDuracionRafaga());
 
-        System.out.println("El quantum es: " + this.quantum);
+//        System.out.println("El quantum es: " + this.quantum);
         boolean terminoRafaga = false;
         for(int i =0; i <this.quantum ; i++){
-            this.tiempoActual++;
-            System.out.println("\nTiempo: " + this.tiempoActual);
-            agregarResultado("\nTiempo: " + this.tiempoActual);
             int Q = i +1;
             System.out.println("* se ejecuta el Quantum: " + Q);
             proceso.actualizarRafaga();
@@ -185,6 +180,10 @@ public class RoundRobin {
             int tiempoCpuUtilizado = proceso.getTiempoCPUtilizado();
             tiempoCpuUtilizado ++;
             proceso.setTiempoCPUutilizado(tiempoCpuUtilizado);
+            this.tiempoActual++;
+            int tiempoSiguiente = this.tiempoActual + 1;
+            System.out.println("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
+            agregarResultado("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
 
             actualizaColaListos();
             actualizaColaBloqueados();
@@ -227,13 +226,14 @@ public class RoundRobin {
     }
 
     private void ejecutarTIP(Proceso proceso) {
+        System.out.println("Se ejecuta el TIP para el proceso P" + proceso.getNumeroProceso());
+        agregarResultado("Se ejecuta el TIP para el proceso P" + proceso.getNumeroProceso());
         for (int i = 0; i < this.TIP; i++) {
             proceso.setEjecutoTIP(true);
             this.tiempoActual++;
-            System.out.println("\nTiempo: " + this.tiempoActual);
-            agregarResultado("\nTiempo: " + this.tiempoActual);
-            System.out.println("Se ejecuta el TIP para el proceso P" + proceso.getNumeroProceso());
-            agregarResultado("Se ejecuta el TIP para el proceso P" + proceso.getNumeroProceso());
+            int tiempoSiguiente = this.tiempoActual + 1;
+            System.out.println("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
+            agregarResultado("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
             actualizaColaListos();
             actualizaColaBloqueados();
         }
@@ -242,12 +242,13 @@ public class RoundRobin {
     }
 
     private void ejecutarTCP(Proceso proceso) {
+        System.out.println("Se ejecuta el TCP para el proceso P" + proceso.getNumeroProceso());
+        agregarResultado("Se ejecuta el TCP para el proceso P" + proceso.getNumeroProceso());
         for (int i = 0; i < this.TCP; i++) {
             tiempoActual++;
-            System.out.println("\nTiempo: " + this.tiempoActual);
-            agregarResultado("\nTiempo: " + this.tiempoActual);
-            System.out.println("Se ejecuta el TCP para el proceso P" + proceso.getNumeroProceso());
-            agregarResultado("Se ejecuta el TCP para el proceso P" + proceso.getNumeroProceso());
+            int tiempoSiguiente = this.tiempoActual + 1;
+            System.out.println("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
+            agregarResultado("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
             actualizaColaListos();
             actualizaColaBloqueados();
         }
@@ -256,12 +257,13 @@ public class RoundRobin {
     }
 
     private void ejecutarTFP(Proceso proceso) {
+        System.out.println("Se ejecuta el TFP para el proceso P" + proceso.getNumeroProceso());
+        agregarResultado("Se ejecuta el TFP para el proceso P" + proceso.getNumeroProceso());
         for (int i = 0; i < this.TFP; i++) {
             tiempoActual++;
-            System.out.println("\nTiempo: " + this.tiempoActual);
-            agregarResultado("\nTiempo: " + this.tiempoActual);
-            System.out.println("Se ejecuta el TFP para el proceso P" + proceso.getNumeroProceso());
-            agregarResultado("Se ejecuta el TFP para el proceso P" + proceso.getNumeroProceso());
+            int tiempoSiguiente = this.tiempoActual + 1;
+            System.out.println("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
+            agregarResultado("\nTiempo [ " + this.tiempoActual + " - " + tiempoSiguiente + " ]");
             actualizaColaListos();
             actualizaColaBloqueados();
         }
