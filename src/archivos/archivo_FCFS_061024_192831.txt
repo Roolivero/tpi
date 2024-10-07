@@ -248,24 +248,27 @@ El proceso P4 ha terminado su ejecución
 
 El planificador de procesos terminó exitosamente!
 
+Las estadisticas solicitadas son las siguientes: 
+
 Proceso: P1
 Tiempo de retorno: 20
-Tiempo de retorno normalizado: 1
+Tiempo de retorno normalizado: 3.3333333
 
 Proceso: P2
 Tiempo de retorno: 43
-Tiempo de retorno normalizado: 3
+Tiempo de retorno normalizado: 7.1666665
 
 Proceso: P3
 Tiempo de retorno: 27
-Tiempo de retorno normalizado: 3
+Tiempo de retorno normalizado: 6.75
 
 Proceso: P4
 Tiempo de retorno: 45
-Tiempo de retorno normalizado: 1
+Tiempo de retorno normalizado: 3.75
 
 Proceso: P5
 Tiempo de retorno: 33
-Tiempo de retorno normalizado: 2
+Tiempo de retorno normalizado: 5.5
+
 Tiempo de retorno de la tanda: 51
-Tiempo medio de retorno de la tanda: 33
+Tiempo medio de retorno de la tanda: 33.0

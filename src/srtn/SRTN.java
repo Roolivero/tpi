@@ -204,6 +204,36 @@ public class SRTN {
 
 
     public void ejecutar() {
+
+        System.out.println("Los datos ingresados son: ");
+        System.out.println("TIP: " + this.getTIP());
+        System.out.println("TCP: " + this.getTCP());
+        System.out.println("TFP: " + this.getTFP());
+        agregarResultado("Los datos ingresados son: ");
+        agregarResultado("TIP: " + this.getTIP());
+        agregarResultado("TCP: " + this.getTCP());
+        agregarResultado("TFP: " + this.getTFP());
+
+        System.out.println("\nLos procesos que se van a utilizar son: ");
+        agregarResultado("\nLos procesos que se van a utilizar son: ");
+        for(Proceso proceso : this.procesos){
+            System.out.println("\n");
+            agregarResultado("\n");
+            System.out.println("Proceso: P" + proceso.getNumeroProceso());
+            System.out.println("Tiempo de arribo: " + proceso.getTiempoArribo());
+            System.out.println("Cantidad de rafagas: " + proceso.getCantRafagas());
+            System.out.println("Duracion de cada rafaga: " + proceso.getDuracionRafaga());
+            System.out.println("Duracion del bloqueo: " + proceso.getDuracionBloqueo());
+            System.out.println("Prioridad: " + proceso.getPrioridad());
+            agregarResultado("Proceso: P" + proceso.getNumeroProceso());
+            agregarResultado("Tiempo de arribo: " + proceso.getTiempoArribo());
+            agregarResultado("Cantidad de rafagas: " + proceso.getCantRafagas());
+            agregarResultado("Duracion de cada rafaga: " + proceso.getDuracionRafaga());
+            agregarResultado("Duracion del bloqueo: " + proceso.getDuracionBloqueo());
+            agregarResultado("Prioridad: " + proceso.getPrioridad());
+        }
+
+
         actualizaColaListos();
 
         //Almacena cual fue el ultimo proceso en ejecutarse, al principio es nulo
@@ -212,8 +242,8 @@ public class SRTN {
 
         while (this.getColaFinalizados().size() < this.cantProcesos ) {
             if (this.colaListos.isEmpty()) { //SI NO hay proceso:
-                System.out.println("la CPU esta inactiva");
-                agregarResultado("la CPU esta inactiva");
+                System.out.println("\nla CPU esta inactiva");
+                agregarResultado("\nla CPU esta inactiva");
                 this.tiempoActual++; //Avanzo en el tiempo
                 System.out.println("\nTiempo: " + this.tiempoActual);
                 agregarResultado("\nTiempo: " + this.tiempoActual);

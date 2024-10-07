@@ -27,7 +27,6 @@ public class IniciarProyecto {
                     continue;
                 }
 
-                // Supongamos que los datos están separados por comas
                 String[] datos = linea.split(",");
 
                 // Parseamos los datos y creamos el objeto Proceso

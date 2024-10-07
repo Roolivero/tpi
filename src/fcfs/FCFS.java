@@ -39,11 +39,37 @@ public class FCFS {
     }
 
     public void ejecutar() {
+
+        System.out.println("Los datos ingresados son: ");
         System.out.println("TIP: " + this.getTIP());
         System.out.println("TCP: " + this.getTCP());
         System.out.println("TFP: " + this.getTFP());
-        agregarResultado("Comienza la simulacion del planificador aplicando FCFS");
-        agregarResultado("Tiempo: " + this.tiempoActual);
+        agregarResultado("Los datos ingresados son: ");
+        agregarResultado("TIP: " + this.getTIP());
+        agregarResultado("TCP: " + this.getTCP());
+        agregarResultado("TFP: " + this.getTFP());
+
+        System.out.println("\nLos procesos que se van a utilizar son: ");
+        agregarResultado("\nLos procesos que se van a utilizar son: ");
+        for(Proceso proceso : this.procesos){
+            System.out.println("\n");
+            agregarResultado("\n");
+            System.out.println("Proceso: P" + proceso.getNumeroProceso());
+            System.out.println("Tiempo de arribo: " + proceso.getTiempoArribo());
+            System.out.println("Cantidad de rafagas: " + proceso.getCantRafagas());
+            System.out.println("Duracion de cada rafaga: " + proceso.getDuracionRafaga());
+            System.out.println("Duracion del bloqueo: " + proceso.getDuracionBloqueo());
+            System.out.println("Prioridad: " + proceso.getPrioridad());
+            agregarResultado("Proceso: P" + proceso.getNumeroProceso());
+            agregarResultado("Tiempo de arribo: " + proceso.getTiempoArribo());
+            agregarResultado("Cantidad de rafagas: " + proceso.getCantRafagas());
+            agregarResultado("Duracion de cada rafaga: " + proceso.getDuracionRafaga());
+            agregarResultado("Duracion del bloqueo: " + proceso.getDuracionBloqueo());
+            agregarResultado("Prioridad: " + proceso.getPrioridad());
+        }
+
+        agregarResultado("\nComienza la simulacion del planificador aplicando FCFS");
+        agregarResultado("\nTiempo: " + this.tiempoActual);
         actualizaColaListos();
 
 
@@ -57,6 +83,7 @@ public class FCFS {
             } else { // si SI hay procesos, saco el primero que este en la cola de listos
                     Proceso proceso = this.colaListos.poll();
                     System.out.println("Se saca el proceso: " + proceso.getNumeroProceso());
+
                if (proceso.getRafagasEjecutadas() == 0) { // verifico si ya ejecuto o no su TIP
                     ejecutarTIP(proceso);
                 } else {

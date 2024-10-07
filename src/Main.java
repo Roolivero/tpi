@@ -22,17 +22,6 @@ public class Main {
         List<Proceso> listaProcesos = new ArrayList<>();
         listaProcesos = iniciarProyecto.leerArchivo();
 
-        System.out.println("Los procesos que se van a utilizar son: ");
-        for(Proceso proceso : listaProcesos){
-            System.out.println("\n");
-            System.out.println("Proceso: P" + proceso.getNumeroProceso());
-            System.out.println("Tiempo de arribo: " + proceso.getTiempoArribo());
-            System.out.println("Cantidad de rafagas: " + proceso.getCantRafagas());
-            System.out.println("Duracion de cada rafaga: " + proceso.getDuracionRafaga());
-            System.out.println("Duracion del bloqueo: " + proceso.getDuracionBloqueo());
-            System.out.println("Prioridad: " + proceso.getPrioridad());
-        }
-
         // Formatear la fecha y hora actual
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyy_HHmmss");
         String timestamp = LocalDateTime.now().format(formatter);
@@ -53,7 +42,7 @@ public class Main {
             prioridadExterna.ejecutar();
         } else if (opcion == 3){
             RoundRobin roundRobin = new RoundRobin(listaDatos,listaProcesos, rutaArvhivoRR);
-            //roundRobin.ejecutar();
+            roundRobin.ejecutar();
         } else if (opcion == 4) {
             SPN spn = new SPN(listaDatos,listaProcesos,rutaArvhivoSPN);
             spn.ejecutar();
