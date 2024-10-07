@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="tpi_so:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/tpi_so_jar</output-path>
+    <root id="archive" name="tpi_so.jar">
+      <element id="module-output" name="tpi_so" />
+    </root>
+  </artifact>
+</component>

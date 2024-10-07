@@ -27,18 +27,18 @@ public class Main {
         String timestamp = LocalDateTime.now().format(formatter);
 
         // Crear nombres de archivo con timestamp
-        String rutaArvhivoFCFS = "src\\archivos\\archivo_FCFS_" + timestamp + ".txt";
-        String rutaArvhivoSPN = "src\\archivos\\archivo_SPN_" + timestamp + ".txt";
-        String rutaArvhivoPE = "src\\archivos\\archivo_PE_" + timestamp + ".txt";
-        String rutaArvhivoSRTN = "src\\archivos\\archivo_SRTN_" + timestamp + ".txt";
-        String rutaArvhivoRR = "src\\archivos\\archivo_RR_" + timestamp + ".txt";
+        String rutaArvhivoFCFS = "archivos/archivo_FCFS_" + timestamp + ".txt";
+        String rutaArvhivoSPN = "archivos/archivo_SPN_" + timestamp + ".txt";
+        String rutaArvhivoPE = "archivos/archivo_PE_" + timestamp + ".txt";
+        String rutaArvhivoSRTN = "archivos/archivo_SRTN_" + timestamp + ".txt";
+        String rutaArvhivoRR = "archivos/archivo_RR_" + timestamp + ".txt";
 
         int opcion = listaDatos.get(0);
         if(opcion == 1){
             FCFS fcfs = new FCFS(listaDatos,listaProcesos, rutaArvhivoFCFS);
             fcfs.ejecutar();
         } else if (opcion == 2) {
-            PrioridadExterna prioridadExterna = new PrioridadExterna(listaDatos,listaProcesos, rutaArvhivoFCFS);
+            PrioridadExterna prioridadExterna = new PrioridadExterna(listaDatos,listaProcesos, rutaArvhivoPE);
             prioridadExterna.ejecutar();
         } else if (opcion == 3){
             RoundRobin roundRobin = new RoundRobin(listaDatos,listaProcesos, rutaArvhivoRR);

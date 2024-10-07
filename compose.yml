@@ -1,0 +1,8 @@
+services:
+  app:
+    image: openjdk:22-ea-jdk
+    working_dir: /app
+    volumes:
+      - ./:/app:rw
+      - ./out/artifacts/tpi_so_jar/tpi_so.jar:/app/tpi_so.jar:rw
+    command: java -jar tpi_so.jar
