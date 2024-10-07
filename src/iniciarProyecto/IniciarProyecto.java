@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.Scanner;
 
 public class IniciarProyecto {
-    String rutaArchivo =  "C:\\Users\\oroci\\OneDrive\\Desktop\\Facu\\3ro\\2do cuatri\\sistemas_operativos\\tpi_so\\archivo.txt";
+    String rutaArchivo =  "archivo.txt";
     Scanner scanner = new Scanner(System.in);
 
     public List<Proceso> leerArchivo() {
